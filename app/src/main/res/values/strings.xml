@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">TimeTravel</string>
+
+    <string name="google_client_id">282356621189-sd2i4jman7d8hpqvn2rqjq38rfsnukee.apps.googleusercontent.com</string>
+    <string name="google_client_secret">18FWZ-cp81ZPpPsMdVzqrSt8</string>
+    <string name="facebook_app_id">692595817867486</string>
+    <string name="fb_login_protocol_scheme">fb692595817867486</string>
 </resources>
