@@ -5,4 +5,8 @@
     <string name="google_client_secret">18FWZ-cp81ZPpPsMdVzqrSt8</string>
     <string name="facebook_app_id">692595817867486</string>
     <string name="fb_login_protocol_scheme">fb692595817867486</string>
+    <string name="modal_login_on_cancel">Login canceled</string>
+    <string name="modal_internet_error_title">Internet connection error</string>
+    <string name="modal_internet_error_description">Cannot connect to internet. Check your internet connection.</string>
+    <string name="modal_login_error_fb">Facebook error</string>
 </resources>
