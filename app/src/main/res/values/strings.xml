@@ -1,12 +1,16 @@
 <resources>
     <string name="app_name">TimeTravel</string>
 
-    <string name="google_client_id">282356621189-sd2i4jman7d8hpqvn2rqjq38rfsnukee.apps.googleusercontent.com</string>
-    <string name="google_client_secret">18FWZ-cp81ZPpPsMdVzqrSt8</string>
+    <string name="google_client_id">282356621189-m9d115k639rr7g8siaapldb3l72ja88l.apps.googleusercontent.com</string>
+    <string name="google_web_client_id">282356621189-sd2i4jman7d8hpqvn2rqjq38rfsnukee.apps.googleusercontent.com</string>
+    <string name="google_web_client_secret">18FWZ-cp81ZPpPsMdVzqrSt8</string>
     <string name="facebook_app_id">692595817867486</string>
     <string name="fb_login_protocol_scheme">fb692595817867486</string>
+
     <string name="modal_login_on_cancel">Login canceled</string>
     <string name="modal_internet_error_title">Internet connection error</string>
     <string name="modal_internet_error_description">Cannot connect to internet. Check your internet connection.</string>
+    <string name="modal_login_auth_error">Auth error</string>
     <string name="modal_login_error_fb">Facebook error</string>
+    <string name="modal_login_error_google">Google error</string>
 </resources>

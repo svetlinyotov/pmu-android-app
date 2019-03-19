@@ -1,8 +1,7 @@
 package bg.tusofia.sem6.pmu.myapplication;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -18,7 +17,7 @@ public class LocationsActivity extends AppCompatActivity {
 
         Button buttonLogOut = findViewById(R.id.buttonLogOut);
 
-        ((TextView)findViewById(R.id.textView)).setText("Email: " + StoredData.getString(this, StoredData.LOGGED_USER_EMAIL));
+        ((TextView) findViewById(R.id.textView)).setText("Email: " + StoredData.getString(this, StoredData.LOGGED_USER_EMAIL));
 
         buttonLogOut.setOnClickListener((v) -> {
             Auth.logOut(this);

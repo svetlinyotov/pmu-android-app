@@ -18,7 +18,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
@@ -34,6 +33,7 @@ import bg.tusofia.sem6.pmu.myapplication.Utils.Toast;
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
+    private static final int GOOGLE_RESPONCE_CODE = 101;
 
     private View mainPreloadView;
 
@@ -53,12 +53,14 @@ public class MainActivity extends Activity {
         mainPreloadView = findViewById(R.id.mainPreloadView);
 
         // FB Login //TODO: extract in separate method or better be static class
+        //TODO: da se optimizira tuka , mnogo smells :)
         fbOriginalButton.setReadPermissions(Arrays.asList("email", "public_profile"));
         callbackManager = CallbackManager.Factory.create();
         fbOriginalButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 mainPreloadView.setVisibility(View.VISIBLE);
+                Log.d(TAG, loginResult.getAccessToken().getToken());
                 if (loginResult.getAccessToken() != null) {
                     getFBData(loginResult.getAccessToken());
                 }
@@ -72,7 +74,7 @@ public class MainActivity extends Activity {
             @Override
             public void onError(FacebookException exception) {
                 Log.d(TAG, exception.getMessage());
-                new AlertDialog(MainActivity.this).getBuilder().setTitle("Auth error").setMessage(getResources().getString(R.string.modal_login_error_fb)).show();
+                new AlertDialog(MainActivity.this).getBuilder().setTitle(getResources().getString(R.string.modal_login_auth_error)).setMessage(getResources().getString(R.string.modal_login_error_fb)).show();
             }
         });
 
@@ -88,7 +90,7 @@ public class MainActivity extends Activity {
 
         // Google login //TODO: extract in separate method
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestServerAuthCode(getResources().getString(R.string.google_client_id))
+                .requestIdToken(getResources().getString(R.string.google_web_client_id))
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -114,27 +116,28 @@ public class MainActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+
         Log.d(TAG, requestCode + " " + resultCode + " " + data);
-        if (resultCode == Activity.RESULT_OK)
-            switch (requestCode) {
-                case 101:
-                    try {
-                        // The Task returned from this call is always completed, no need to attach
-                        // a listener.
-                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                        GoogleSignInAccount account = task.getResult(ApiException.class);
-                        if (account != null && Auth.signIn(this, AuthOrigin.GOOGLE, account.getEmail(), account.getDisplayName(), account.getId(), account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null, account.getIdToken())) {
-                            //TODO: send request to server backend
-                            onLoggedIn();
-                        } else {
-                            Toast.make(this, "Cannot sign to google");
-                        }
-                    } catch (ApiException e) {
-                        // The ApiException status code indicates the detailed failure reason.
-                        Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+        switch (requestCode) {
+            case 101:
+                try {
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    GoogleSignInAccount account = task.getResult(ApiException.class);
+                    if (account != null && Auth.signIn(this, AuthOrigin.GOOGLE, account.getEmail(), account.getDisplayName(), account.getId(), account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null, account.getIdToken())) {
+                        //TODO: send request to server backend
+                        onLoggedIn();
+                    } else {
+                        Toast.make(this, "Cannot sign to google");
                     }
-                    break;
-            }
+                } catch (ApiException e) {
+                    // The ApiException status code indicates the detailed failure reason.
+                    e.printStackTrace();
+                    Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                    new AlertDialog(MainActivity.this).getBuilder().setTitle(getResources().getString(R.string.modal_login_auth_error)).setMessage(getResources().getString(R.string.modal_login_error_google)).show();
+                }
+                break;
+        }
     }
 
     private void onLoggedIn() {
@@ -166,7 +169,7 @@ public class MainActivity extends Activity {
                             String id = object.getString("id");
                             String image_url = "https://graph.facebook.com/" + id + "/picture?type=large";
 
-                            if (Auth.signIn(this, AuthOrigin.FACEBOOK, id, email, first_name + " " + last_name, image_url, accessToken.getToken())) {
+                            if (Auth.signIn(this, AuthOrigin.FACEBOOK, email, first_name + " " + last_name, id, image_url, accessToken.getToken())) {
                                 //TODO: send request to server backend
                                 onLoggedIn();
                             }

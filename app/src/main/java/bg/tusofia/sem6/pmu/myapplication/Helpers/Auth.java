@@ -1,15 +1,11 @@
 package bg.tusofia.sem6.pmu.myapplication.Helpers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 
 import bg.tusofia.sem6.pmu.myapplication.MainActivity;
 import bg.tusofia.sem6.pmu.myapplication.R;
@@ -34,14 +30,14 @@ public class Auth {
 
     public static boolean logOut(final Context context) {
         try {
-            if (AuthOrigin.valueOf(StoredData.getString(context, StoredData.LOGGED_USER_TOKEN)).equals(AuthOrigin.FACEBOOK)) {
+            if (AuthOrigin.valueOf(StoredData.getString(context, StoredData.LOGGED_USER_ORIGIN)).equals(AuthOrigin.FACEBOOK)) {
                 LoginManager.getInstance().logOut();
             } else {
                 GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestServerAuthCode(context.getResources().getString(R.string.google_client_id))
                         .requestEmail()
                         .build();
-                 GoogleSignIn.getClient(context, gso).signOut();
+                GoogleSignIn.getClient(context, gso).signOut();
             }
             StoredData.saveString(context, StoredData.LOGGED_USER_ORIGIN, null);
             StoredData.saveString(context, StoredData.LOGGED_USER_EMAIL, null);
