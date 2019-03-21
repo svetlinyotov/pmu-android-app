@@ -24,9 +24,15 @@ import com.google.android.gms.tasks.Task;
 import org.json.JSONException;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import bg.tusofia.sem6.pmu.myapplication.Helpers.Auth;
 import bg.tusofia.sem6.pmu.myapplication.Helpers.AuthOrigin;
+import bg.tusofia.sem6.pmu.myapplication.ServerRequest.Method;
+import bg.tusofia.sem6.pmu.myapplication.ServerRequest.Request;
+import bg.tusofia.sem6.pmu.myapplication.ServerRequest.RequestBuilder;
+import bg.tusofia.sem6.pmu.myapplication.ServerRequest.URL;
 import bg.tusofia.sem6.pmu.myapplication.Utils.AlertDialog;
 import bg.tusofia.sem6.pmu.myapplication.Utils.Toast;
 
@@ -41,6 +47,7 @@ public class MainActivity extends Activity {
 
     private GoogleSignInClient googleSignInClient;
 
+    private Request serverRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +59,8 @@ public class MainActivity extends Activity {
         Button googleButton = findViewById(R.id.buttonLoginWithGoogle);
         mainPreloadView = findViewById(R.id.mainPreloadView);
 
-        // FB Login //TODO: extract in separate method or better be static class
-        //TODO: da se optimizira tuka , mnogo smells :)
+        serverRequest = new Request(this);
+
         fbOriginalButton.setReadPermissions(Arrays.asList("email", "public_profile"));
         callbackManager = CallbackManager.Factory.create();
         fbOriginalButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -88,7 +95,6 @@ public class MainActivity extends Activity {
 
         });
 
-        // Google login //TODO: extract in separate method
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getResources().getString(R.string.google_web_client_id))
                 .requestEmail()
@@ -98,7 +104,7 @@ public class MainActivity extends Activity {
 
             if (!Auth.isLoggedIn(this)) {
                 Log.d(TAG, "Google: startActivityForResult");
-                startActivityForResult(googleSignInClient.getSignInIntent(), 101);
+                startActivityForResult(googleSignInClient.getSignInIntent(), GOOGLE_RESPONCE_CODE);
             }
         });
     }
@@ -120,24 +126,28 @@ public class MainActivity extends Activity {
 
         Log.d(TAG, requestCode + " " + resultCode + " " + data);
         switch (requestCode) {
-            case 101:
+            case GOOGLE_RESPONCE_CODE:
                 try {
                     Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                     GoogleSignInAccount account = task.getResult(ApiException.class);
                     if (account != null && Auth.signIn(this, AuthOrigin.GOOGLE, account.getEmail(), account.getDisplayName(), account.getId(), account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null, account.getIdToken())) {
-                        //TODO: send request to server backend
-                        onLoggedIn();
+                        sendLoggedUserToServer(AuthOrigin.GOOGLE, account.getEmail(), account.getDisplayName(), account.getId(), account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null, account.getIdToken());
                     } else {
                         Toast.make(this, "Cannot sign to google");
                     }
                 } catch (ApiException e) {
-                    // The ApiException status code indicates the detailed failure reason.
                     e.printStackTrace();
                     Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
                     new AlertDialog(MainActivity.this).getBuilder().setTitle(getResources().getString(R.string.modal_login_auth_error)).setMessage(getResources().getString(R.string.modal_login_error_google)).show();
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        serverRequest.stop();
     }
 
     private void onLoggedIn() {
@@ -170,8 +180,9 @@ public class MainActivity extends Activity {
                             String image_url = "https://graph.facebook.com/" + id + "/picture?type=large";
 
                             if (Auth.signIn(this, AuthOrigin.FACEBOOK, email, first_name + " " + last_name, id, image_url, accessToken.getToken())) {
-                                //TODO: send request to server backend
-                                onLoggedIn();
+                                sendLoggedUserToServer(AuthOrigin.FACEBOOK, email, first_name + " " + last_name, id, image_url, accessToken.getToken());
+                            } else {
+                                Toast.make(this, "Could not verify your credentials.");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -186,5 +197,39 @@ public class MainActivity extends Activity {
             request.executeAndWait();
 
         }).start();
+    }
+
+    private void sendLoggedUserToServer(AuthOrigin origin, String email, String names, String userId, String image, String token) {
+
+        Map<String, String> params = new HashMap<>();
+        params.put("origin", String.valueOf(origin));
+        params.put("email", email);
+        params.put("socialId", userId);
+        params.put("names", names);
+        params.put("image", image);
+        params.put("access_token", token);
+
+        serverRequest.send(
+                new RequestBuilder(Method.POST, URL.OAUTH_LOGIN)
+                        .setResponseListener(response -> onLoggedIn())
+                        .setErrorListener(error -> {
+                            Log.d(TAG, new String(error.networkResponse.data));
+
+                                    mainPreloadView.setVisibility(View.GONE);
+
+                                    new AlertDialog(MainActivity.this).getBuilder()
+                                            .setTitle(getResources().getString(R.string.modal_server_error_title))
+                                            .setMessage(getResources().getString(R.string.modal_server_error_description))
+                                            .setNegativeButton(android.R.string.ok, (dialog, which) -> {
+                                                dialog.cancel();
+                                                Auth.logOut(this);
+                                            })
+                                            .show();
+
+                                }
+                        )
+                        .addParams(params)
+                        .build(this)
+        );
     }
 }

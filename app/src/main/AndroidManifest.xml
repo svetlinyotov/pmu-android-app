@@ -3,6 +3,8 @@
     package="bg.tusofia.sem6.pmu.myapplication">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -41,6 +43,11 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+
+        <service
+            android:name=".services.LocationBackgroundService"
+            android:process=":time_travellers_location_checker" />
     </application>
 
 </manifest>
