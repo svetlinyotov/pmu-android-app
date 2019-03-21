@@ -57,4 +57,16 @@ public class Auth {
     public static boolean isLoggedIn(final Context context) {
         return StoredData.getString(context, StoredData.LOGGED_USER_TOKEN) != null;
     }
+
+    public static String getAccessToken(final Context context) {
+        return StoredData.getString(context, StoredData.LOGGED_USER_TOKEN);
+    }
+
+    public static String getUserId(final Context context) {
+        return StoredData.getString(context, StoredData.LOGGED_USER_ID);
+    }
+
+    public static String getOrigin(final Context context) {
+        return StoredData.getString(context, StoredData.LOGGED_USER_ORIGIN);
+    }
 }
