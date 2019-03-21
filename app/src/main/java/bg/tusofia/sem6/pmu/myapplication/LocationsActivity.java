@@ -21,14 +21,18 @@ import bg.tusofia.sem6.pmu.myapplication.Utils.StoredData;
 
 public class LocationsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
+    SupportMapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locations);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null)
+            mapFragment.getMapAsync(this);
+
 
         Button buttonLogOut = findViewById(R.id.buttonLogOut);
 
