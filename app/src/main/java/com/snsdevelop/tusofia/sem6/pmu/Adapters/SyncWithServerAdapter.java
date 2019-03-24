@@ -8,6 +8,7 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -21,12 +22,13 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
 
     public SyncWithServerAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
-        locationsViewModel = ViewModelProviders.of((FragmentActivity) context).get(LocationsViewModel.class);
+        locationsViewModel = ViewModelProviders.of((AppCompatActivity) context).get(LocationsViewModel.class);
+        Log.d("SyncWithServerAdapter", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     }
 
     public SyncWithServerAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
-        locationsViewModel = ViewModelProviders.of((FragmentActivity) context).get(LocationsViewModel.class);
+        locationsViewModel = ViewModelProviders.of((AppCompatActivity) context).get(LocationsViewModel.class);
     }
 
     @Override

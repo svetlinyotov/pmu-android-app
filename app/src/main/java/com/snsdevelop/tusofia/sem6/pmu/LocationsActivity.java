@@ -24,6 +24,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.PopupWindow;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,6 +34,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -64,6 +67,9 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
     private Location currentLocation = null;
     private ImageButton startGame;
     private TextView textStartGame;
+
+    private FusedLocationProviderClient fusedLocationClient;
+
     private TreeSet<LatLng> markers = new TreeSet<>((a, b) -> {
         if (currentLocation != null) {
             Location locationA = new Location("point A");
@@ -92,6 +98,7 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
         startService(new Intent(LocationsActivity.this, PlayAudioService.class));
 
         serverRequest = new Request(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -109,6 +116,24 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
 
         buttonLogOut.setOnClickListener((v) -> Auth.logOut(this));
         mute.setOnClickListener((v) -> stopService(new Intent(LocationsActivity.this, PlayAudioService.class)));
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null && markers.size() > 0) {
+                        Location a = new Location("KUR");
+                        LatLng c = markers.first();
+                        a.setLatitude(c.latitude);
+                        a.setLongitude(c.longitude);
+
+                        if (location.distanceTo(a) < 10000) {
+                            startGame.setVisibility(View.VISIBLE);
+                            textStartGame.setVisibility(View.VISIBLE);
+                        } else {
+                            startGame.setVisibility(View.GONE);
+                            textStartGame.setVisibility(View.GONE);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -153,12 +178,7 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
             mPopupWindow.setElevation(5.0f);
             Button closeButton = popup.findViewById(R.id.dismiss);
 
-            closeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mPopupWindow.dismiss();
-                }
-            });
+            closeButton.setOnClickListener(view -> mPopupWindow.dismiss());
             mPopupWindow.showAtLocation(mRelativeLayout, Gravity.CENTER, 0, 0);
 
 
@@ -207,7 +227,6 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
                                     mMap.addMarker(new MarkerOptions()
                                             .position(position)
                                             .title(location.getName())
-                                            .anchor(0.2f, 1)
                                             .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
                                     );
                                     builder.include(position);
@@ -228,17 +247,6 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
                                     nearestMarkerAndLocationBounds.include(markers.first()); // Get the nearest marker form the sorted set
                                     nearestMarkerAndLocationBounds.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
                                     mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(nearestMarkerAndLocationBounds.build(), 150));
-                                }
-
-                                Location a = new Location("KUR");
-                                LatLng c = markers.first();
-                                a.setLatitude(c.latitude);
-                                a.setLongitude(c.longitude);
-                                //TODO: possibe null pointer !!
-                                if (currentLocation.distanceTo(a) < 10000) {
-                                    startGame.setVisibility(View.VISIBLE);
-                                    textStartGame.setVisibility(View.VISIBLE);
-
                                 }
                             }
                         })

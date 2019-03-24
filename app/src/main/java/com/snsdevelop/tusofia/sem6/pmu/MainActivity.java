@@ -1,5 +1,6 @@
 package com.snsdevelop.tusofia.sem6.pmu;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -58,8 +59,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Account account = SyncServiceHelper.CreateSyncAccount(this);
+        ContentResolver.setSyncAutomatically(account, AUTHORITY, true);
+        ContentResolver.requestSync(account, AUTHORITY, Bundle.EMPTY);
         ContentResolver.addPeriodicSync(
-                SyncServiceHelper.CreateSyncAccount(this),
+                account,
                 AUTHORITY,
                 Bundle.EMPTY,
                 1); // Every 1 minutes
