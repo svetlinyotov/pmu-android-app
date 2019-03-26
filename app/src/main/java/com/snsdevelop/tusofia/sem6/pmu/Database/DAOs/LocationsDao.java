@@ -7,14 +7,14 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.Location;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 
 @Dao
 public interface LocationsDao {
 
     @Query("SELECT * from locations ORDER BY id ASC")
-    List<Location> getAll();
+    List<LocationEntity> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Location word);
+    void insert(LocationEntity word);
 }

@@ -6,9 +6,9 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import com.snsdevelop.tusofia.sem6.pmu.Database.DAOs.LocationsDao;
-import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.Location;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 
-@androidx.room.Database(entities = {Location.class}, version = 1, exportSchema = false)
+@androidx.room.Database(entities = {LocationEntity.class}, version = 1, exportSchema = false)
 public abstract class Database extends RoomDatabase {
     public abstract LocationsDao locationsDao();
 

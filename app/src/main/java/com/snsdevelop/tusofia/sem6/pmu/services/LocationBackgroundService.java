@@ -29,11 +29,11 @@ public class LocationBackgroundService extends Service {
             mLastLocation.set(location);
             //TODO: WIP
             /*
-            Location loc1 = new Location("");
+            LocationEntity loc1 = new LocationEntity("");
             loc1.setLatitude(lat1);
             loc1.setLongitude(lon1);
 
-            Location loc2 = new Location("");
+            LocationEntity loc2 = new LocationEntity("");
             loc2.setLatitude(lat2);
             loc2.setLongitude(lon2);
 

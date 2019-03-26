@@ -4,7 +4,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "locations")
-public class Location {
+public class LocationEntity {
 
     @PrimaryKey
     private int id;
