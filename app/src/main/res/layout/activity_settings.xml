@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/history_background">
+
+
+    <ImageButton
+        android:id="@+id/buttonBack"
+        android:layout_width="60dp"
+        android:layout_height="70dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_all_games" />
+
+
+    <ImageButton
+        android:id="@+id/buttonLogOut"
+        android:layout_width="60dp"
+        android:layout_height="70dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/button_all_games" />
+
+    <TextView
+        android:id="@+id/textViewTitleSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="40dp"
+        android:text="Settings"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+
+    <fragment
+        android:id="@+id/fragmentSettings"
+        android:name="com.snsdevelop.tusofia.sem6.pmu.Fragments.SettingsFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/textViewTitleSettings"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

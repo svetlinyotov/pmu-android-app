@@ -13,7 +13,8 @@ public class StoredData {
     public static final String LOGGED_USER_IMAGE = "logged_user_image";
     public static final String LOGGED_USER_TOKEN = "logged_user_token";
 
-    static final String SETTINGS_IS_MUTED = "settingsIsBGMusicMuted";
+    public static final String SETTINGS_IS_BG_MUSIC_PLAYING = "settingsIsBGMusicMuted";
+    public static final String SETTINGS_CURRENT_LANGUAGE = "settingsCurrentLanguage";
 
     public static void saveInt(Context context, String key, Integer value) {
         SharedPreferences.Editor edit = getSP(context).edit();

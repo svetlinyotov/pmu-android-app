@@ -21,6 +21,8 @@
 
         <activity android:name="com.snsdevelop.tusofia.sem6.pmu.LocationsActivity" />
         <activity android:name="com.snsdevelop.tusofia.sem6.pmu.PreloadActivity" />
+        <activity android:name="com.snsdevelop.tusofia.sem6.pmu.SettingsActivity" />
+        <activity android:name="com.snsdevelop.tusofia.sem6.pmu.BaseActivity" />
         <activity android:name="com.snsdevelop.tusofia.sem6.pmu.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

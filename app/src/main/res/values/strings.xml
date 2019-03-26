@@ -15,4 +15,8 @@
     <string name="modal_login_error_google">Google error</string>
     <string name="modal_server_error_title">Cannot connect to server</string>
     <string name="modal_server_error_description">Try to login again</string>
+    <string name="settings_mute">Background music</string>
+    <string name="settings_language">Display language</string>
+    <string name="settings_language_bg">Bulgarian</string>
+    <string name="settings_language_en">English</string>
 </resources>

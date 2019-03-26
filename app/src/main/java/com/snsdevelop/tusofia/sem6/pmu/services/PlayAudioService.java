@@ -3,49 +3,119 @@ package com.snsdevelop.tusofia.sem6.pmu.services;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.snsdevelop.tusofia.sem6.pmu.R;
 
-public class PlayAudioService extends Service {
-    private static final String TAG = "PlayAudioService";
-    MediaPlayer objPlayer;
+public class PlayAudioService extends Service implements MediaPlayer.OnErrorListener {
+    private final IBinder mBinder = new ServiceBinder();
+    MediaPlayer mPlayer;
+    private int length = 0;
 
-    public void onCreate() {
-        super.onCreate();
-        Log.d(TAG, "Service Started!");
-        objPlayer = MediaPlayer.create(this, R.raw.background_music);
-        objPlayer.setLooping(true);
+    public PlayAudioService() {
     }
 
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        objPlayer.start();
-        Log.d(TAG, "Media Player started!");
-        if (!objPlayer.isLooping()) {
-            Log.d(TAG, "Problem in Playing Audio");
+    public class ServiceBinder extends Binder {
+        public PlayAudioService getService() {
+            return PlayAudioService.this;
         }
-        return Service.START_NOT_STICKY;
-    }
-
-    public void onStop() {
-        objPlayer.stop();
-        objPlayer.release();
-    }
-
-    public void onPause() {
-        objPlayer.stop();
-        objPlayer.release();
-    }
-
-    public void onDestroy() {
-        objPlayer.stop();
-        objPlayer.release();
     }
 
     @Override
-    public IBinder onBind(Intent objIndent) {
-        return null;
+    public IBinder onBind(Intent arg0) {
+        return mBinder;
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        createPlayer();
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (mPlayer != null)
+            mPlayer.start();
+        return START_STICKY;
+    }
+
+    public void pauseMusic() {
+        if (mPlayer == null)
+            createPlayer();
+
+        if (mPlayer.isPlaying()) {
+            mPlayer.pause();
+            length = mPlayer.getCurrentPosition();
+
+        }
+    }
+
+    public void resumeMusic() {
+        if (mPlayer == null)
+            createPlayer();
+
+        if (!mPlayer.isPlaying()) {
+            mPlayer.seekTo(length);
+            mPlayer.start();
+        }
+    }
+
+    public void stopMusic() {
+        if (mPlayer == null)
+            createPlayer();
+
+        if (mPlayer != null) {
+            mPlayer.stop();
+            mPlayer.release();
+        }
+        mPlayer = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mPlayer != null) {
+            try {
+                mPlayer.stop();
+                mPlayer.release();
+            } finally {
+                mPlayer = null;
+                Log.d("KUUUR", "NUUUL");
+            }
+        }
+    }
+
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+
+        Toast.makeText(this, "music player failed", Toast.LENGTH_SHORT).show();
+        if (mPlayer != null) {
+            try {
+                mPlayer.stop();
+                mPlayer.release();
+            } finally {
+                mPlayer = null;
+            }
+        }
+        return false;
+    }
+
+    private void createPlayer() {
+        mPlayer = MediaPlayer.create(this, R.raw.background_music);
+        mPlayer.setOnErrorListener(this);
+
+        if (mPlayer != null) {
+            mPlayer.setLooping(true);
+            mPlayer.setVolume(100, 100);
+        }
+
+
+        mPlayer.setOnErrorListener((mp, what, extra) -> {
+//                onError(mPlayer, what, extra);
+            return true;
+        });
+    }
 }

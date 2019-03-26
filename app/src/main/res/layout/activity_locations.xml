@@ -14,24 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/buttonLogOut"
-        android:text="ЛОГНА СА АЛЕЛЕЙЛЕЙЛЕЙЛЕЛЙЕЛЙЕ" />
-
-    <Button
-        android:id="@+id/buttonLogOut"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="Логни са аут"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <ImageButton
         android:id="@+id/buttonRanking"
         android:layout_width="60dp"
@@ -80,12 +62,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/buttonMute"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
-        android:layout_marginEnd="20dp"
-        android:text="Mute" />
 
+    <ImageButton
+        android:id="@+id/buttonSettings"
+        android:layout_width="60dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/button_all_games"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

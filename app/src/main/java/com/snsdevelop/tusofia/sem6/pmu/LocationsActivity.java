@@ -2,29 +2,25 @@ package com.snsdevelop.tusofia.sem6.pmu;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
-import android.view.View;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.PopupWindow;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -37,27 +33,23 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.LocationsViewModel;
-import com.snsdevelop.tusofia.sem6.pmu.Helpers.Auth;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
-import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
-import com.snsdevelop.tusofia.sem6.pmu.services.PlayAudioService;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
 
 import static com.snsdevelop.tusofia.sem6.pmu.Utils.PermissionCheck.LOCATION_PERMISSION_REQUEST_CODE;
 
-public class LocationsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class LocationsActivity extends BaseActivity implements OnMapReadyCallback {
     private Context mContext;
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
@@ -103,8 +95,6 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
         mRelativeLayout = findViewById(R.id.locations);
         mContext = getApplicationContext();
 
-        startService(new Intent(LocationsActivity.this, PlayAudioService.class));
-
         serverRequest = new Request(this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationsViewModel = ViewModelProviders.of(this).get(LocationsViewModel.class);
@@ -115,17 +105,11 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
             mapFragment.getMapAsync(this);
 
 
-        Button buttonLogOut = findViewById(R.id.buttonLogOut);
-        Button mute = findViewById(R.id.buttonMute);
         startGame = findViewById(R.id.buttonStartGame);
         textStartGame = findViewById(R.id.textStartGame);
+        ImageButton buttonSettings = findViewById(R.id.buttonSettings);
 
-
-        ((TextView) findViewById(R.id.textView)).setText("Email: " + StoredData.getString(this, StoredData.LOGGED_USER_EMAIL));
-
-        buttonLogOut.setOnClickListener((v) -> Auth.logOut(this));
-        mute.setOnClickListener((v) -> stopService(new Intent(LocationsActivity.this, PlayAudioService.class)));
-
+        buttonSettings.setOnClickListener((v) -> startActivity(new Intent(this, SettingsActivity.class)));
     }
 
     @Override
@@ -183,7 +167,6 @@ public class LocationsActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     protected void onStop() {
         super.onStop();
-        stopService(new Intent(LocationsActivity.this, PlayAudioService.class));
         serverRequest.stop();
     }
 
