@@ -13,7 +13,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/button_all_games" />
+        android:background="@drawable/button_back" />
 
 
     <ImageButton
@@ -24,7 +24,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/button_all_games" />
+        android:background="@drawable/button_logout" />
 
     <TextView
         android:id="@+id/textViewTitleSettings"

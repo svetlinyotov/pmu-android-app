@@ -6,7 +6,7 @@ android {
             keyPassword '1qaz2wsx3edc'
             storePassword '1qaz2wsx3edc'
             keyAlias 'key0'
-            storeFile file('C:/Users/stefa/Desktop/Sem_6/PMU/Keys/dev_keys.jks')
+            storeFile file('E:/dev_keys.jks')
         }
     }
     compileSdkVersion 28

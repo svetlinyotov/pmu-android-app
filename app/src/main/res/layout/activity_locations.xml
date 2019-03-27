@@ -16,12 +16,12 @@
 
     <ImageButton
         android:id="@+id/buttonRanking"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/button_ranking"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:background="@drawable/button_rank"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -56,8 +56,8 @@
         android:layout_width="60dp"
         android:layout_height="70dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="70dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="28dp"
         android:background="@drawable/button_all_games"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -65,11 +65,11 @@
 
     <ImageButton
         android:id="@+id/buttonSettings"
-        android:layout_width="60dp"
+        android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginBottom="20dp"
         android:layout_marginStart="20dp"
-        android:background="@drawable/button_all_games"
+        android:background="@drawable/button_settings"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true" />
 </RelativeLayout>

@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -108,8 +109,10 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         startGame = findViewById(R.id.buttonStartGame);
         textStartGame = findViewById(R.id.textStartGame);
         ImageButton buttonSettings = findViewById(R.id.buttonSettings);
+        ImageButton buttonRanking = findViewById(R.id.buttonRanking);
 
         buttonSettings.setOnClickListener((v) -> startActivity(new Intent(this, SettingsActivity.class)));
+        buttonRanking.setOnClickListener((v) -> startActivity(new Intent(this, RankActivity.class)));
     }
 
     @Override
@@ -152,7 +155,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
                     LayoutParams.MATCH_PARENT
             );
             mPopupWindow.setElevation(5.0f);
-            Button closeButton = popup.findViewById(R.id.dismiss);
+            ImageButton closeButton = popup.findViewById(R.id.dismiss);
             WebView webView = popup.findViewById(R.id.webViewMarkerInfoPopup);
 
             closeButton.setOnClickListener(view -> mPopupWindow.dismiss());
