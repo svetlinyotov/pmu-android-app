@@ -8,7 +8,7 @@
 
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/ivStar"
         android:layout_width="40dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
@@ -16,7 +16,6 @@
         android:gravity="center"
         android:textAlignment="center"
         android:visibility="visible"
-        android:background="@drawable/paper1"
         app:srcCompat="@android:drawable/btn_star_big_on" />
 
     <TextView

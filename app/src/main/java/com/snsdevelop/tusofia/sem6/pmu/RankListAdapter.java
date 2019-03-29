@@ -4,7 +4,10 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -44,6 +47,12 @@ public class RankListAdapter extends ArrayAdapter<String> {
 
         holder.name.setText("Ime");
         holder.points.setText("653");
+
+        ImageView star = convertView.findViewById(R.id.ivStar);
+
+        Animation rotate = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
+        star.startAnimation(rotate);
+
 
         return convertView;
     }
