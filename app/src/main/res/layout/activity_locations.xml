@@ -31,7 +31,7 @@
         android:layout_height="150dp"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="430dp"
-        android:layout_marginEnd="130dp"
+        android:layout_marginEnd="110dp"
         android:background="@drawable/start_game_button"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="570dp"
-        android:layout_marginEnd="110dp"
+        android:layout_marginEnd="90dp"
         android:text="START GAME"
         android:textColor="#340000"
         android:textSize="32sp"
@@ -65,7 +65,7 @@
 
     <ImageButton
         android:id="@+id/buttonSettings"
-        android:layout_width="70dp"
+        android:layout_width="75dp"
         android:layout_height="70dp"
         android:layout_marginBottom="20dp"
         android:layout_marginStart="20dp"

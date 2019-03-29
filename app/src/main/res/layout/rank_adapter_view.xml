@@ -9,48 +9,52 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:layout_weight="10"
         android:gravity="center"
         android:textAlignment="center"
-        android:visibility="invisible"
+        android:visibility="visible"
+        android:background="@drawable/paper1"
         app:srcCompat="@android:drawable/btn_star_big_on" />
 
     <TextView
         android:id="@+id/tvPlaceInRank"
-        android:layout_width="wrap_content"
+        android:layout_width="30dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:layout_weight="10"
         android:gravity="center"
         android:text="1."
+        android:background="@drawable/paper1"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="18sp" />
 
     <TextView
         android:id="@+id/tvNameInRank"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:layout_weight="60"
         android:gravity="center"
         android:text="TextView"
+        android:background="@drawable/paper1"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="18sp" />
 
     <TextView
         android:id="@+id/tvPointInRank"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:layout_weight="15"
         android:gravity="center"
         android:text="509"
         android:textAlignment="center"
+        android:background="@drawable/paper1"
         android:textColor="#000000"
         android:textSize="18sp" />
 
