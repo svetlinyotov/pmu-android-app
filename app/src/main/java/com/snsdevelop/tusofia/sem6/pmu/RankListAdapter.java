@@ -50,7 +50,7 @@ public class RankListAdapter extends ArrayAdapter<String> {
 
         ImageView star = convertView.findViewById(R.id.ivStar);
 
-        Animation rotate = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
+        Animation rotate = AnimationUtils.loadAnimation(mContext, android.R.anim.bounce_interpolator);
         star.startAnimation(rotate);
 
 
