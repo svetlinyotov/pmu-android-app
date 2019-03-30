@@ -155,6 +155,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
                     LayoutParams.MATCH_PARENT
             );
             mPopupWindow.setElevation(5.0f);
+            mPopupWindow.setAnimationStyle(R.style.WindowPopupAnimation);
             ImageButton closeButton = popup.findViewById(R.id.dismiss);
             WebView webView = popup.findViewById(R.id.webViewMarkerInfoPopup);
 
@@ -190,8 +191,8 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         List<LocationEntity> locations = locationsViewModel.getAll();
 
         if (locations != null) {
-            int height = 200;
-            int width = 200;
+            int height = 150;
+            int width = 150;
             Bitmap bitmapFlag = ((BitmapDrawable) getResources().getDrawable(R.drawable.bg_flag, this.getTheme())).getBitmap();
             Bitmap smallMarker = Bitmap.createScaledBitmap(bitmapFlag, width, height, false);
 
