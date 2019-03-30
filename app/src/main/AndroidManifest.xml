@@ -19,12 +19,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
-        <activity android:name="com.snsdevelop.tusofia.sem6.pmu.LocationsActivity" />
-        <activity android:name="com.snsdevelop.tusofia.sem6.pmu.PreloadActivity" />
-        <activity android:name="com.snsdevelop.tusofia.sem6.pmu.RankActivity" />
-        <activity android:name="com.snsdevelop.tusofia.sem6.pmu.SettingsActivity" />
-        <activity android:name="com.snsdevelop.tusofia.sem6.pmu.BaseActivity" />
-        <activity android:name="com.snsdevelop.tusofia.sem6.pmu.MainActivity">
+        <activity android:name=".LocationsActivity" />
+        <activity android:name=".PreloadActivity" />
+        <activity android:name=".RankActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".BaseActivity" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

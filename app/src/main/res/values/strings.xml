@@ -19,4 +19,8 @@
     <string name="settings_language">Display language</string>
     <string name="settings_language_bg">Bulgarian</string>
     <string name="settings_language_en">English</string>
+    <string name="description">Description</string>
+    <string name="button_start_game">START GAME</string>
+    <string name="title_settings">Settings</string>
+    <string name="button_logout">Logout</string>
 </resources>

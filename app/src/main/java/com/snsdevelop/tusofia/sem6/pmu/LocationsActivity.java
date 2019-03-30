@@ -9,7 +9,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,7 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
-import android.widget.Button;
+import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -61,6 +60,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
     private ImageButton startGame;
     private TextView textStartGame;
 
+    private RelativeLayout progressBar;
     private LocationsViewModel locationsViewModel;
     private FusedLocationProviderClient fusedLocationClient;
     private LinkedList<LatLng> markers = new LinkedList<>();
@@ -93,6 +93,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locations);
+        progressBar = findViewById(R.id.layoutProgressBar);
         mRelativeLayout = findViewById(R.id.locations);
         mContext = getApplicationContext();
 
@@ -146,6 +147,8 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
 
 
         mMap.setOnMarkerClickListener(marker -> {
+            progressBar.setVisibility(View.VISIBLE);
+
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
             View popup = inflater.inflate(R.layout.marker_info_popup, null);
 
@@ -160,9 +163,16 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
             WebView webView = popup.findViewById(R.id.webViewMarkerInfoPopup);
 
             closeButton.setOnClickListener(view -> mPopupWindow.dismiss());
-            webView.loadUrl("http://google.com/" + marker.getId()); //TODO: from server
-            mPopupWindow.showAtLocation(mRelativeLayout, Gravity.CENTER, 0, 0);
 
+            webView.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    progressBar.setVisibility(View.GONE);
+                    mPopupWindow.showAtLocation(mRelativeLayout, Gravity.CENTER, 0, 0);
+                }
+            });
+
+            webView.loadUrl("https://snsdevelop.com/time-travellers/api/v1/app/locations/" + marker.getTag());
 
             return true;
         });
