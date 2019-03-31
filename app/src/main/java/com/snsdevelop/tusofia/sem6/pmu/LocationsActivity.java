@@ -274,7 +274,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
                 currentLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
 
                 fusedLocationClient.requestLocationUpdates(
-                        new LocationRequest().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(1),
+                        new LocationRequest().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(10),
                         locationCallback,
                         null
                 );

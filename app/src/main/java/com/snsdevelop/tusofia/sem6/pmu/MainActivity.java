@@ -38,6 +38,7 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.AlertDialog;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.SyncServiceHelper;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
+import com.snsdevelop.tusofia.sem6.pmu.services.LocationBackgroundService;
 
 import static com.snsdevelop.tusofia.sem6.pmu.Utils.SyncServiceHelper.AUTHORITY;
 
@@ -58,6 +59,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        startService(new Intent(this, LocationBackgroundService.class));
 
         Account account = SyncServiceHelper.CreateSyncAccount(this);
         ContentResolver.setSyncAutomatically(account, AUTHORITY, true);

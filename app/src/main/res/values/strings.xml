@@ -30,4 +30,7 @@
     <string name="error_sync_locations">Error syncing data for locations</string>
     <string name="error_sync_ranking">Error sync data for ranking</string>
     <string name="error_sync_all_games">Error sync data for all games</string>
+    <string name="notification_near_location_title">Start your game now</string>
+    <string name="notification_near_location_description">You are near Time Travel location where you can learn something new. Find a team or play single. Come to experience something new and unforgettable</string>
+    <string name="notification_near_location_text">You are near Time Travel location</string>
 </resources>
