@@ -111,9 +111,12 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         textStartGame = findViewById(R.id.textStartGame);
         ImageButton buttonSettings = findViewById(R.id.buttonSettings);
         ImageButton buttonRanking = findViewById(R.id.buttonRanking);
+        ImageButton buttonAllGames = findViewById(R.id.buttonAllGames);
 
         buttonSettings.setOnClickListener((v) -> startActivity(new Intent(this, SettingsActivity.class)));
         buttonRanking.setOnClickListener((v) -> startActivity(new Intent(this, RankActivity.class)));
+        buttonAllGames.setOnClickListener((v) -> startActivity(new Intent(this, AllGamesActivity.class)));
+
     }
 
     @Override

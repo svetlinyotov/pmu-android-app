@@ -13,8 +13,10 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.AllGamesEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.RankEntity;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Repositories.AllGamesRepository;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Repositories.LocationsRepository;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Repositories.RankingRepository;
 import com.snsdevelop.tusofia.sem6.pmu.R;
@@ -22,6 +24,7 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
 import java.util.ArrayList;
@@ -35,11 +38,13 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
 
     private LocationsRepository locationsRepository;
     private RankingRepository rankingRepository;
+    private AllGamesRepository allGamesRepository;
 
     public SyncWithServerAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         rankingRepository = new RankingRepository((Application) context);
         locationsRepository = new LocationsRepository((Application) context);
+        allGamesRepository = new AllGamesRepository((Application) context);
         serverRequest = new Request(context);
         this.context = context;
     }
@@ -48,6 +53,7 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
         super(context, autoInitialize, allowParallelSyncs);
         rankingRepository = new RankingRepository((Application) context);
         locationsRepository = new LocationsRepository((Application) context);
+        allGamesRepository = new AllGamesRepository((Application) context);
         serverRequest = new Request(context);
         this.context = context;
     }
@@ -89,6 +95,33 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
                             Toast.make(context, context.getString(R.string.error_sync_ranking));
                         })
                         .build(context)
+        );
+
+        serverRequest.send(
+                new RequestBuilder(Method.GET, URL.GET_ALL_GAMES)
+                        .setResponseListener(response -> {
+                            List<AllGamesEntity> allGamesEntityList = new GsonBuilder()
+                                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                    .create()
+                                    .fromJson(response, new TypeToken<ArrayList<AllGamesEntity>>() {
+                                    }.getType());
+
+
+                            for (AllGamesEntity allGamesEntity : allGamesEntityList) {
+                                allGamesRepository.insert(allGamesEntity);
+                            }
+                        })
+                        .setErrorListener(error -> {
+                            Toast.make(context, context.getString(R.string.error_sync_all_games));
+                        })
+
+                        .addHeader("AuthOrigin", StoredData.getString(context, StoredData.LOGGED_USER_ORIGIN))
+                        .addHeader("AccessToken", StoredData.getString(context, StoredData.LOGGED_USER_TOKEN))
+                        .addHeader("AuthSocialId", StoredData.getString(context, StoredData.LOGGED_USER_ID))
+
+                        .build(context)
+
+
         );
     }
 }

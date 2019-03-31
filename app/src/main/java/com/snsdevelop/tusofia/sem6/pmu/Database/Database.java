@@ -5,16 +5,21 @@ import android.content.Context;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import com.snsdevelop.tusofia.sem6.pmu.Database.DAOs.AllGamesDao;
 import com.snsdevelop.tusofia.sem6.pmu.Database.DAOs.LocationsDao;
 import com.snsdevelop.tusofia.sem6.pmu.Database.DAOs.RankingDao;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.AllGamesEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.RankEntity;
 
-@androidx.room.Database(entities = {LocationEntity.class, RankEntity.class}, version = 3, exportSchema = false)
+@androidx.room.Database(entities = {LocationEntity.class, RankEntity.class, AllGamesEntity.class}, version = 4, exportSchema = false)
+
 public abstract class Database extends RoomDatabase {
     public abstract LocationsDao locationsDao();
 
     public abstract RankingDao rankingDao();
+
+    public abstract AllGamesDao allGamesDao();
 
     private static volatile Database INSTANCE;
 

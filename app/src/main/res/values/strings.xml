@@ -24,7 +24,10 @@
     <string name="title_settings">Settings</string>
     <string name="button_logout">Logout</string>
     <string name="title_rank_list">Rank list</string>
+    <string name="title_all_games_list">All games</string>
     <string name="error_taking_ranking_list">Error taking ranking list</string>
+    <string name="error_taking_all_games">Error taking all games</string>
     <string name="error_sync_locations">Error syncing data for locations</string>
     <string name="error_sync_ranking">Error sync data for ranking</string>
+    <string name="error_sync_all_games">Error sync data for all games</string>
 </resources>

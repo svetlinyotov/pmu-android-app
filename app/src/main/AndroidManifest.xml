@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
@@ -18,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-
+        <activity android:name=".AllGamesActivity"></activity>
         <activity android:name=".LocationsActivity" />
         <activity android:name=".PreloadActivity" />
         <activity android:name=".RankActivity" />
@@ -35,7 +34,6 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCrZOmvprsxv5UcqjlyBmIYgDLMCFwPYN4" />
@@ -57,25 +55,23 @@
             </intent-filter>
         </activity>
 
-
         <service
             android:name=".services.LocationBackgroundService"
             android:process=":time_travellers_location_checker" />
         <service
             android:name=".services.PlayAudioService"
             android:enabled="true" />
-
         <service
             android:name=".services.AuthenticatorService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
+
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/sync_with_server_authenticator" />
         </service>
-
         <service
             android:name=".services.SyncWithServerService"
             android:exported="false"
@@ -83,6 +79,7 @@
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
+
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_with_server_adapter" />

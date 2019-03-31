@@ -9,7 +9,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.snsdevelop.tusofia.sem6.pmu.Adapters.RankListAdapter;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.RankEntity;
-import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.LocationsViewModel;
 import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.RankingViewModel;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;

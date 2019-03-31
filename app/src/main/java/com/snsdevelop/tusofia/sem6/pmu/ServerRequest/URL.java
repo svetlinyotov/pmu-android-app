@@ -12,4 +12,5 @@ public interface URL {
     String OAUTH_LOGIN = PREFIX + "/login";
     String GET_ALL_LOCATIONS = PREFIX + "/locations";
     String GET_GLOBAL_RANKING = PREFIX + "/ranking";
+    String GET_ALL_GAMES = PREFIX + "/ranking/personal";
 }
