@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
     android:weightSum="100">
 
 
@@ -13,9 +15,9 @@
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:layout_weight="10"
+        android:contentDescription="@string/description"
         android:gravity="center"
         android:textAlignment="center"
-        android:visibility="visible"
         app:srcCompat="@android:drawable/btn_star_big_on" />
 
     <TextView
@@ -24,9 +26,8 @@
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:layout_weight="10"
-        android:gravity="center"
-        android:text="1."
         android:background="@drawable/paper1"
+        android:gravity="center"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="18sp" />
@@ -36,10 +37,9 @@
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
-        android:layout_weight="60"
-        android:gravity="center"
-        android:text="TextView"
+        android:layout_weight="70"
         android:background="@drawable/paper1"
+        android:gravity="center"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="18sp" />
@@ -50,10 +50,9 @@
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:layout_weight="15"
-        android:gravity="center"
-        android:text="509"
-        android:textAlignment="center"
         android:background="@drawable/paper1"
+        android:gravity="center"
+        android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="18sp" />
 

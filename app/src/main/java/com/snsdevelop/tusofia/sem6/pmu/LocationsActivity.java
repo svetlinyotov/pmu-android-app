@@ -236,20 +236,21 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
                 return 0;
             });
 
-            LatLngBounds bounds = builder.build();
+            if (locations.size() > 0) {
+                LatLngBounds bounds = builder.build();
 
-
-            if (!mMap.isMyLocationEnabled() || currentLocation == null) {
-                if (locations.size() == 1) {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 15));
-                } else if (locations.size() > 1) {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                if (!mMap.isMyLocationEnabled() || currentLocation == null) {
+                    if (locations.size() == 1) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 15));
+                    } else if (locations.size() > 1) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                    }
+                } else {
+                    LatLngBounds.Builder nearestMarkerAndLocationBounds = new LatLngBounds.Builder();
+                    nearestMarkerAndLocationBounds.include(markers.get(0)); // Get the nearest marker form the sorted set
+                    nearestMarkerAndLocationBounds.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(nearestMarkerAndLocationBounds.build(), 150));
                 }
-            } else {
-                LatLngBounds.Builder nearestMarkerAndLocationBounds = new LatLngBounds.Builder();
-                nearestMarkerAndLocationBounds.include(markers.get(0)); // Get the nearest marker form the sorted set
-                nearestMarkerAndLocationBounds.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(nearestMarkerAndLocationBounds.build(), 150));
             }
         }
     }

@@ -6,11 +6,15 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import com.snsdevelop.tusofia.sem6.pmu.Database.DAOs.LocationsDao;
+import com.snsdevelop.tusofia.sem6.pmu.Database.DAOs.RankingDao;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.RankEntity;
 
-@androidx.room.Database(entities = {LocationEntity.class}, version = 1, exportSchema = false)
+@androidx.room.Database(entities = {LocationEntity.class, RankEntity.class}, version = 3, exportSchema = false)
 public abstract class Database extends RoomDatabase {
     public abstract LocationsDao locationsDao();
+
+    public abstract RankingDao rankingDao();
 
     private static volatile Database INSTANCE;
 
@@ -20,6 +24,7 @@ public abstract class Database extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             Database.class, "time_travellers_database")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

@@ -55,12 +55,19 @@
 
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/lvRank"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/layoutSwipeRanking"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/layoutTitleRank"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="0dp" />
+        android:layout_marginEnd="0dp">
+
+        <ListView
+            android:id="@+id/lvRank"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
 </RelativeLayout>
