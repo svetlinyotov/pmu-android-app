@@ -34,11 +34,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.LocationsViewModel;
+import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
+import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
+import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,6 +58,8 @@ import androidx.lifecycle.ViewModelProviders;
 import static com.snsdevelop.tusofia.sem6.pmu.Utils.PermissionCheck.LOCATION_PERMISSION_REQUEST_CODE;
 
 public class LocationsActivity extends BaseActivity implements OnMapReadyCallback {
+    public static final String NEAREST_LOCATION_ID_EXTRA = "nearest_location_id";
+
     private Context mContext;
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
@@ -63,20 +73,25 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
     private RelativeLayout progressBar;
     private LocationsViewModel locationsViewModel;
     private FusedLocationProviderClient fusedLocationClient;
-    private LinkedList<LatLng> markers = new LinkedList<>();
+    private LinkedList<Marker> markers = new LinkedList<>();
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
+            sortMarkers();
+
             if (locationResult != null && markers.size() > 0) {
 
                 Location lastLocation = locationResult.getLastLocation();
-                Log.d("KUR", lastLocation.toString());
-                Location a = new Location("KURI");
-                LatLng c = markers.get(0);
-                a.setLatitude(c.latitude);
-                a.setLongitude(c.longitude);
+
+                Location a = new Location("Current Location");
+                Marker c = markers.get(0);
+                a.setLatitude(c.getPosition().latitude);
+                a.setLongitude(c.getPosition().longitude);
+
+                Log.d("KUR", c.toString());
+                Log.d("KUR", String.valueOf(lastLocation.distanceTo(a)));
 
                 if (lastLocation.distanceTo(a) < 10000) {
                     startGame.setVisibility(View.VISIBLE);
@@ -116,6 +131,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         buttonSettings.setOnClickListener((v) -> startActivity(new Intent(this, SettingsActivity.class)));
         buttonRanking.setOnClickListener((v) -> startActivity(new Intent(this, RankActivity.class)));
         buttonAllGames.setOnClickListener((v) -> startActivity(new Intent(this, AllGamesActivity.class)));
+        startGame.setOnClickListener((v) -> startActivity(new Intent(this, PlayModeActivity.class).putExtra(NEAREST_LOCATION_ID_EXTRA, (int) markers.get(0).getTag())));
 
     }
 
@@ -136,9 +152,9 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         if (mapFragment.getView() != null) {
             // Move the My location button
             RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) mapFragment.getView().findViewById(MyLocationButtonId).getLayoutParams();
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
             rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-            rlp.setMargins(0, 390, 0, 0);
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+            rlp.setMargins(20, 20, 0, 0);
 
             // Move the zoom control buttons
             RelativeLayout.LayoutParams zoomControlsParams = (RelativeLayout.LayoutParams) mapFragment.getView().findViewById(ZoomControlId).getLayoutParams();
@@ -203,6 +219,29 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
     private void loadMarkers() {
         List<LocationEntity> locations = locationsViewModel.getAll();
 
+        if (locations == null || locations.size() == 0) {
+            serverRequest.send(
+                    new RequestBuilder(Method.GET, URL.GET_ALL_LOCATIONS)
+                            .setResponseListener(response -> {
+                                List<LocationEntity> locationEntities = new Gson().fromJson(response, new TypeToken<ArrayList<LocationEntity>>() {
+                                }.getType());
+
+                                displayMarkers(locationEntities);
+
+                                for (LocationEntity locationEntity : locationEntities) {
+                                    locationsViewModel.insert(locationEntity);
+                                }
+                            })
+                            .setErrorListener(error -> Toast.make(this, getString(R.string.error_sync_locations))
+                            )
+                            .build(this)
+            );
+        } else {
+            displayMarkers(locations);
+        }
+    }
+
+    private void displayMarkers(List<LocationEntity> locations) {
         if (locations != null) {
             int height = 150;
             int width = 150;
@@ -213,31 +252,19 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
 
             for (LocationEntity location : locations) {
                 LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.addMarker(new MarkerOptions()
+
+                Marker marker = mMap.addMarker(new MarkerOptions()
                         .position(position)
                         .title(location.getName())
                         .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
-                ).setTag(location.getId());
+                );
+                marker.setTag(location.getId());
 
-                builder.include(position);
-                markers.add(position);
+                builder.include(marker.getPosition());
+                markers.add(marker);
             }
 
-            markers.sort((a, b) -> {
-                if (currentLocation != null) {
-                    Location locationA = new Location("point A");
-                    locationA.setLatitude(a.latitude);
-                    locationA.setLongitude(a.longitude);
-                    Location locationB = new Location("point B");
-                    locationB.setLatitude(b.latitude);
-                    locationB.setLongitude(b.longitude);
-
-                    float distanceOne = currentLocation.distanceTo(locationA);
-                    float distanceTwo = currentLocation.distanceTo(locationB);
-                    return Float.compare(distanceOne, distanceTwo);
-                }
-                return 0;
-            });
+            sortMarkers();
 
             if (locations.size() > 0) {
                 LatLngBounds bounds = builder.build();
@@ -250,12 +277,30 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
                     }
                 } else {
                     LatLngBounds.Builder nearestMarkerAndLocationBounds = new LatLngBounds.Builder();
-                    nearestMarkerAndLocationBounds.include(markers.get(0)); // Get the nearest marker form the sorted set
+                    nearestMarkerAndLocationBounds.include(markers.get(0).getPosition()); // Get the nearest marker form the sorted set
                     nearestMarkerAndLocationBounds.include(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(nearestMarkerAndLocationBounds.build(), 150));
                 }
             }
         }
+    }
+
+    private void sortMarkers() {
+        markers.sort((a, b) -> {
+            if (currentLocation != null) {
+                Location locationA = new Location("point A");
+                locationA.setLatitude(a.getPosition().latitude);
+                locationA.setLongitude(a.getPosition().longitude);
+                Location locationB = new Location("point B");
+                locationB.setLatitude(b.getPosition().latitude);
+                locationB.setLongitude(b.getPosition().longitude);
+
+                float distanceOne = currentLocation.distanceTo(locationA);
+                float distanceTwo = currentLocation.distanceTo(locationB);
+                return Float.compare(distanceOne, distanceTwo);
+            }
+            return 0;
+        });
     }
 
     private void showDefaultLocation() {

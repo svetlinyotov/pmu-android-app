@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/history_background"
+    tools:context=".PlayModeActivity">
+
+    <RelativeLayout
+        android:id="@+id/layoutTitlePlayMode"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/old_color"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/buttonBack"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="8dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/button_back_color"
+            android:contentDescription="@string/description"
+            android:gravity="center_vertical"
+            android:scaleType="fitXY" />
+
+
+        <TextView
+            android:id="@+id/textViewTitleSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@id/buttonBack"
+            android:fontFamily="@font/history_lowercase"
+            android:gravity="center_vertical|end"
+            android:text="@string/title_play_mode"
+            android:textAlignment="viewEnd"
+            android:textSize="40sp" />
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/buttonStartSinglePlayerGame"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/start_game_button"
+        android:contentDescription="@string/description"
+        android:elevation="10dp"
+        android:layout_below="@id/layoutTitlePlayMode"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/textStartSinglePlayerGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/buttonStartSinglePlayerGame"
+        android:text="@string/title_single_player"
+        android:textColor="#340000"
+        android:textSize="32sp" />
+
+    <ImageButton
+        android:id="@+id/buttonStartTeamPlayerGame"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/start_game_button"
+        android:contentDescription="@string/description"
+        android:elevation="10dp"
+        android:layout_below="@id/textStartSinglePlayerGame"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/textStartTeamPlayerGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/buttonStartTeamPlayerGame"
+        android:text="@string/title_team_play"
+        android:textColor="#340000"
+        android:textSize="32sp" />
+
+
+    <ImageButton
+        android:id="@+id/buttonSettings"
+        android:layout_width="75dp"
+        android:layout_height="70dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/button_settings"
+        android:contentDescription="@string/description" />
+</RelativeLayout>

@@ -13,6 +13,8 @@ public class StoredData {
     public static final String LOGGED_USER_IMAGE = "logged_user_image";
     public static final String LOGGED_USER_TOKEN = "logged_user_token";
     public static final String GAME_STATUS = "game_status";
+    public static final String GAME_ID = "game_status";
+    public static final String GAME_NAME = "game_status";
 
     public static final String SETTINGS_IS_BG_MUSIC_PLAYING = "settingsIsBGMusicMuted";
     public static final String SETTINGS_CURRENT_LANGUAGE = "settingsCurrentLanguage";

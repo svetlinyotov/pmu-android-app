@@ -17,7 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".AllGamesActivity"></activity>
+        <activity android:name=".GameMapActivity"></activity>
+        <activity android:name=".PlayModeActivity" />
+        <activity android:name=".AllGamesActivity" />
         <activity android:name=".LocationsActivity" />
         <activity android:name=".PreloadActivity" />
         <activity android:name=".RankActivity" />

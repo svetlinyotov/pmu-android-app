@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "games")
 public class AllGamesEntity {
 
-    @PrimaryKey
-    @NonNull
+    @PrimaryKey(autoGenerate = true)
+    private int id;
     private String userId;
     private String gameId;
     private String gameName;
@@ -20,26 +20,54 @@ public class AllGamesEntity {
     private Double pointsFromCorrectAnswers;
     private Double total;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @NonNull
-    public String getUserId() { return userId; }
+    public String getUserId() {
+        return userId;
+    }
 
-    public void setUserId(@NonNull String userId) { this.userId = userId; }
+    public void setUserId(@NonNull String userId) {
+        this.userId = userId;
+    }
 
-    public String getGameId() { return gameId; }
+    public String getGameId() {
+        return gameId;
+    }
 
-    public void setGameId(String gameId) { this.gameId = gameId; }
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
 
-    public String getGameName() { return gameName; }
+    public String getGameName() {
+        return gameName;
+    }
 
-    public void setGameName(String gameName) { this.gameName = gameName; }
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
 
-    public String getLocationId() { return locationId; }
+    public String getLocationId() {
+        return locationId;
+    }
 
-    public void setLocationId(String locationId) { this.locationId = locationId; }
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
+    }
 
-    public String getLocationName() { return locationName; }
+    public String getLocationName() {
+        return locationName;
+    }
 
-    public void setLocationName(String locationName) { this.locationName = locationName; }
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
 
     public String getEmail() {
         return email;

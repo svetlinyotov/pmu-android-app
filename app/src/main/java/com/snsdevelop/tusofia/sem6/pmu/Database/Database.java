@@ -12,7 +12,7 @@ import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.AllGamesEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.RankEntity;
 
-@androidx.room.Database(entities = {LocationEntity.class, RankEntity.class, AllGamesEntity.class}, version = 4, exportSchema = false)
+@androidx.room.Database(entities = {LocationEntity.class, RankEntity.class, AllGamesEntity.class}, version = 5, exportSchema = false)
 
 public abstract class Database extends RoomDatabase {
     public abstract LocationsDao locationsDao();

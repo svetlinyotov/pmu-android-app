@@ -1,6 +1,7 @@
 package com.snsdevelop.tusofia.sem6.pmu;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -43,6 +44,8 @@ public class AllGamesActivity extends AppCompatActivity {
 
         allGamesAdapter = new AllGamesAdapter(this, R.layout.all_games_adapter_view);
         mListView.setAdapter(allGamesAdapter);
+        Log.d("KUR", String.valueOf(allGamesViewModel.getAll().size()));
+        Log.d("KUR", String.valueOf(allGamesViewModel.getAll()));
         allGamesAdapter.addAll(allGamesViewModel.getAll());
 
         layoutSwipeAllGames.setOnRefreshListener(this::updateData);
