@@ -37,4 +37,14 @@
     <string name="title_single_player">SINGLE PLAYER</string>
     <string name="title_team_play">TEAM PLAY</string>
     <string name="title_game_ready">Game ready</string>
+    <string name="modal_mode_are_you_ready">Are you ready?</string>
+    <string name="modal_mode_button_start_game">Start Game</string>
+    <string name="modal_mode_choose_option">Choose an option</string>
+    <string name="modal_mode_button_team_create">Create Team</string>
+    <string name="modal_mode_button_create">Create</string>
+    <string name="modal_mode_button_cancel">Cancel</string>
+    <string name="modal_mode_button_join_team">Join Team</string>
+    <string name="title_teammates">Teammates</string>
+    <string name="error_team_name_empty">Enter team name</string>
+    <string name="error_parsin_data">Error parsing data</string>
 </resources>

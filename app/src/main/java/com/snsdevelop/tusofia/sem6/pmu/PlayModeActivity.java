@@ -15,6 +15,8 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.AlertDialog;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.PlayMode;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
@@ -51,17 +53,16 @@ public class PlayModeActivity extends AppCompatActivity {
 
         buttonStartSinglePlayerGame.setOnClickListener((v) ->
                 new AlertDialog(this).getBuilder()
-                        .setTitle("Are you ready?")
-                        .setPositiveButton("Start Game", (dialogInterface, which) ->
+                        .setTitle(getString(R.string.modal_mode_are_you_ready))
+                        .setPositiveButton(getString(R.string.modal_mode_button_start_game), (dialogInterface, which) ->
                                 serverRequest.send(
                                         new RequestBuilder(Method.POST, URL.START_SINGLE_PLAYER_GAME)
                                                 .setResponseListener(response -> {
-
                                                     try {
-                                                        Log.d("KUE", response);
                                                         JsonObject gameInfo = new Gson().fromJson(response, JsonObject.class);
 
-                                                        StoredData.saveString(this, StoredData.GAME_STATUS, "running");
+                                                        StoredData.saveString(this, StoredData.GAME_MODE, String.valueOf(PlayMode.SINGLE));
+                                                        StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.RUNNING));
                                                         StoredData.saveInt(this, StoredData.GAME_ID, gameInfo.get("gameId").getAsInt());
                                                         StoredData.saveString(this, StoredData.GAME_NAME, gameInfo.get("gameName").getAsString());
 
@@ -72,7 +73,6 @@ public class PlayModeActivity extends AppCompatActivity {
                                                     }
                                                 })
                                                 .setErrorListener(error -> {
-                                                    Log.d("KUR", new String(error.networkResponse.data));
                                                     Toast.make(this, getString(R.string.error_taking_all_games));
                                                     dialogInterface.cancel();
                                                 })
@@ -88,28 +88,62 @@ public class PlayModeActivity extends AppCompatActivity {
                         .setNegativeButton("Cancel", (dialogInterface, which) -> dialogInterface.cancel())
                         .show());
 
-        buttonStartTeamPlayerGame.setOnClickListener((v) ->
-                new AlertDialog(this).getBuilder()
-                        .setTitle("Choose an option")
-                        .setNegativeButton("Join Team", (dialogInterface, which) -> {
+        buttonStartTeamPlayerGame.setOnClickListener((v) -> {
 
-                        })
-                        .setPositiveButton("Create Team", (dialogInterface, i) ->
-                                new AlertDialog(this).getBuilder()
-                                        .setView(R.layout.dialog_new_team_name)
-                                        .setPositiveButton("Create", (dialogInterface1, i1) -> {
-                                            View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_new_team_name, null);
-                                            final EditText input = viewInflated.findViewById(R.id.editTextTeamName);
-                                            Log.d("KUR", input.getText().toString());
-                                            //TODO:
-                                        })
-                                        .setNegativeButton("Cancel", (dialogInterface1, i1) -> {
-                                            dialogInterface.cancel();
-                                            dialogInterface1.cancel();
-                                        })
-                                        .show()
-                        )
-                        .show());
+            View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_new_team_name, null);
+
+            new AlertDialog(this).getBuilder()
+                    .setTitle(getString(R.string.modal_mode_choose_option))
+                    .setNeutralButton(getString(R.string.modal_mode_button_join_team), (dialogInterface, which) -> {
+
+                    })
+                    .setPositiveButton(getString(R.string.modal_mode_button_team_create), (dialogInterface, i) ->
+                            new AlertDialog(this).getBuilder()
+                                    .setView(viewInflated)
+                                    .setPositiveButton(getString(R.string.modal_mode_button_create), (dialogInterface1, i1) -> {
+                                        final EditText input = viewInflated.findViewById(R.id.editTextTeamName);
+                                        String newTeamName = input.getText().toString();
+
+                                        if (!newTeamName.trim().equals("")) {
+                                            new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_CREATE_TEAM)
+                                                    .setResponseListener(response -> {
+                                                        try {
+                                                            JsonObject gameInfo = new Gson().fromJson(response, JsonObject.class);
+
+                                                            StoredData.saveString(this, StoredData.GAME_MODE, String.valueOf(PlayMode.TEAM));
+                                                            StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.PENDING));
+                                                            StoredData.saveInt(this, StoredData.GAME_ID, gameInfo.get("gameId").getAsInt());
+                                                            StoredData.saveString(this, StoredData.GAME_NAME, gameInfo.get("gameName").getAsString());
+                                                            StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, true);
+
+                                                            startActivity(new Intent(this, WaitingTeammatesActivity.class));
+                                                        } catch (IllegalStateException e) {
+                                                            e.printStackTrace();
+                                                            Toast.make(this, getString(R.string.error_parsin_data));
+                                                        }
+                                                    })
+                                                    .setErrorListener(error -> {
+                                                        Toast.make(this, getString(R.string.error_taking_all_games));
+                                                        dialogInterface.cancel();
+                                                    })
+                                                    .addParam("name", newTeamName)
+                                                    .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                                                    .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                                                    .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+
+                                                    .build(this);
+                                        } else {
+                                            Toast.make(this, getString(R.string.error_team_name_empty));
+                                        }
+                                    })
+                                    .setNegativeButton(getString(R.string.modal_mode_button_cancel), (dialogInterface1, i1) -> {
+                                        dialogInterface.cancel();
+                                        dialogInterface1.cancel();
+                                    })
+                                    .show()
+                    )
+                    .show();
+        });
     }
 
     @Override

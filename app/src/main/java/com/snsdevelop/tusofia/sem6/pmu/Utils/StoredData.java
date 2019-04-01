@@ -13,8 +13,10 @@ public class StoredData {
     public static final String LOGGED_USER_IMAGE = "logged_user_image";
     public static final String LOGGED_USER_TOKEN = "logged_user_token";
     public static final String GAME_STATUS = "game_status";
-    public static final String GAME_ID = "game_status";
-    public static final String GAME_NAME = "game_status";
+    public static final String GAME_MODE = "game_mode";
+    public static final String GAME_ID = "game_id";
+    public static final String GAME_NAME = "game_name";
+    public static final String GAME_IS_TEAM_HOST = "game_is_team_host";
 
     public static final String SETTINGS_IS_BG_MUSIC_PLAYING = "settingsIsBGMusicMuted";
     public static final String SETTINGS_CURRENT_LANGUAGE = "settingsCurrentLanguage";
@@ -34,6 +36,12 @@ public class StoredData {
     public static void saveLong(Context context, String key, Long value) {
         SharedPreferences.Editor edit = getSP(context).edit();
         edit.putLong(key, value);
+        edit.apply();
+    }
+
+    public static void saveBoolean(Context context, String key, Boolean value) {
+        SharedPreferences.Editor edit = getSP(context).edit();
+        edit.putBoolean(key, value);
         edit.apply();
     }
 
