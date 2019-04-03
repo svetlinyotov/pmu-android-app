@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -72,28 +70,29 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
 
     private RelativeLayout progressBar;
     private LocationsViewModel locationsViewModel;
-    private FusedLocationProviderClient fusedLocationClient;
     private LinkedList<Marker> markers = new LinkedList<>();
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
-            sortMarkers();
 
             if (locationResult != null && markers.size() > 0) {
 
                 Location lastLocation = locationResult.getLastLocation();
+                currentLocation = new Location(lastLocation);
+                sortMarkers();
 
                 Location a = new Location("Current Location");
+                sortMarkers();
                 Marker c = markers.get(0);
                 a.setLatitude(c.getPosition().latitude);
                 a.setLongitude(c.getPosition().longitude);
 
-                Log.d("KUR", c.toString());
+                Log.d("KUR", c.getTitle() + " " + c.getTag());
                 Log.d("KUR", String.valueOf(lastLocation.distanceTo(a)));
 
-                if (lastLocation.distanceTo(a) < 10000) {
+                if (lastLocation.distanceTo(a) < 20000) {
                     startGame.setVisibility(View.VISIBLE);
                     textStartGame.setVisibility(View.VISIBLE);
                 } else {
@@ -113,7 +112,6 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         mContext = getApplicationContext();
 
         serverRequest = new Request(this);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationsViewModel = ViewModelProviders.of(this).get(LocationsViewModel.class);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -312,18 +310,14 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         } else if (mMap != null) {
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
 
-            if (locationManager != null) {
-                currentLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-                fusedLocationClient.requestLocationUpdates(
-                        new LocationRequest().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(10),
-                        locationCallback,
-                        null
-                );
-            }
+            fusedLocationClient.requestLocationUpdates(
+                    new LocationRequest().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(10),
+                    locationCallback,
+                    null
+            );
 
             mMap.setMyLocationEnabled(true);
         }

@@ -29,12 +29,27 @@
 
     </RelativeLayout>
 
+
+    <TextView
+        android:id="@+id/textViewTitleNewTeamName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layoutTitleWaitingTeammates"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_toEndOf="@id/buttonBack"
+        android:fontFamily="@font/history_lowercase"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textSize="25sp" />
+
     <ListView
         android:id="@+id/listViewTeammates"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_above="@id/buttonStartTeamGame"
-        android:layout_below="@id/layoutTitleWaitingTeammates" />
+        android:layout_below="@id/textViewTitleNewTeamName" />
 
     <Button
         android:id="@+id/buttonStartTeamGame"

@@ -1,15 +1,26 @@
 package com.snsdevelop.tusofia.sem6.pmu;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.GameEntity;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
@@ -20,13 +31,18 @@ import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.PlayMode;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import static com.snsdevelop.tusofia.sem6.pmu.LocationsActivity.NEAREST_LOCATION_ID_EXTRA;
+import static com.snsdevelop.tusofia.sem6.pmu.WaitingTeammatesActivity.TEAM_NAME_TO_DISPLAY_EXTRA;
 
 public class PlayModeActivity extends AppCompatActivity {
 
     private Request serverRequest;
+    private int locationId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +51,7 @@ public class PlayModeActivity extends AppCompatActivity {
 
         serverRequest = new Request(this);
 
-        int locationId = getIntent().getIntExtra(NEAREST_LOCATION_ID_EXTRA, 0);
+        locationId = getIntent().getIntExtra(NEAREST_LOCATION_ID_EXTRA, 0);
 
         if (locationId == 0) {
             Toast.make(this, "Error taking nearest location");
@@ -88,68 +104,163 @@ public class PlayModeActivity extends AppCompatActivity {
                         .setNegativeButton("Cancel", (dialogInterface, which) -> dialogInterface.cancel())
                         .show());
 
-        buttonStartTeamPlayerGame.setOnClickListener((v) -> {
-
-            View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_new_team_name, null);
-
-            new AlertDialog(this).getBuilder()
-                    .setTitle(getString(R.string.modal_mode_choose_option))
-                    .setNeutralButton(getString(R.string.modal_mode_button_join_team), (dialogInterface, which) -> {
-
-                    })
-                    .setPositiveButton(getString(R.string.modal_mode_button_team_create), (dialogInterface, i) ->
-                            new AlertDialog(this).getBuilder()
-                                    .setView(viewInflated)
-                                    .setPositiveButton(getString(R.string.modal_mode_button_create), (dialogInterface1, i1) -> {
-                                        final EditText input = viewInflated.findViewById(R.id.editTextTeamName);
-                                        String newTeamName = input.getText().toString();
-
-                                        if (!newTeamName.trim().equals("")) {
-                                            new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_CREATE_TEAM)
-                                                    .setResponseListener(response -> {
-                                                        try {
-                                                            JsonObject gameInfo = new Gson().fromJson(response, JsonObject.class);
-
-                                                            StoredData.saveString(this, StoredData.GAME_MODE, String.valueOf(PlayMode.TEAM));
-                                                            StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.PENDING));
-                                                            StoredData.saveInt(this, StoredData.GAME_ID, gameInfo.get("gameId").getAsInt());
-                                                            StoredData.saveString(this, StoredData.GAME_NAME, gameInfo.get("gameName").getAsString());
-                                                            StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, true);
-
-                                                            startActivity(new Intent(this, WaitingTeammatesActivity.class));
-                                                        } catch (IllegalStateException e) {
-                                                            e.printStackTrace();
-                                                            Toast.make(this, getString(R.string.error_parsin_data));
-                                                        }
-                                                    })
-                                                    .setErrorListener(error -> {
-                                                        Toast.make(this, getString(R.string.error_taking_all_games));
-                                                        dialogInterface.cancel();
-                                                    })
-                                                    .addParam("name", newTeamName)
-                                                    .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
-                                                    .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
-                                                    .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
-
-                                                    .build(this);
-                                        } else {
-                                            Toast.make(this, getString(R.string.error_team_name_empty));
-                                        }
-                                    })
-                                    .setNegativeButton(getString(R.string.modal_mode_button_cancel), (dialogInterface1, i1) -> {
-                                        dialogInterface.cancel();
-                                        dialogInterface1.cancel();
-                                    })
-                                    .show()
-                    )
-                    .show();
-        });
+        buttonStartTeamPlayerGame.setOnClickListener((v) -> alertDialogTeamPlay());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         serverRequest.stop();
+    }
+
+    private void alertDialogTeamPlay() {
+        android.app.AlertDialog a = new AlertDialog(this).getBuilder()
+                .setTitle(getString(R.string.modal_mode_choose_option))
+                .setNeutralButton(getString(R.string.modal_mode_button_join_team), (dialogInterface, which) -> alertDialogTeamPlayJoinTeam())
+                .setPositiveButton(getString(R.string.modal_mode_button_team_create), (dialogInterface, i) -> alertDialogTeamPlayCreateTeam(dialogInterface))
+                .create();
+
+//        a.getWindow().setLayout(600, 300);
+//
+//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.paper1);
+//
+//        Drawable drawable = new BitmapDrawable(Bitmap.createScaledBitmap(bitmap, 600, 300, false));
+//
+//        a.getWindow().setBackgroundDrawable(drawable);
+
+        a.show();
+    }
+
+    private void alertDialogTeamPlayCreateTeam(DialogInterface dialogInterface) {
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_new_team_name, null);
+
+        android.app.AlertDialog a = new AlertDialog(this).getBuilder()
+                .setView(viewInflated)
+                .setPositiveButton(getString(R.string.modal_mode_button_create), (dialogInterface1, i1) -> {
+                    final EditText input = viewInflated.findViewById(R.id.editTextTeamName);
+                    final String newTeamName = input.getText().toString();
+
+                    if (!newTeamName.trim().equals("")) {
+                        serverRequest.send(
+                                new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_CREATE_TEAM)
+                                        .setResponseListener(response -> {
+                                            System.out.println(response);
+                                            try {
+                                                JsonObject gameInfo = new Gson().fromJson(response, JsonObject.class);
+
+                                                StoredData.saveString(this, StoredData.GAME_MODE, String.valueOf(PlayMode.TEAM));
+                                                StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.PENDING));
+                                                StoredData.saveInt(this, StoredData.GAME_ID, gameInfo.get("gameId").getAsInt());
+                                                StoredData.saveString(this, StoredData.GAME_NAME, gameInfo.get("gameName").getAsString());
+                                                StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, true);
+
+                                                startActivity(new Intent(this, WaitingTeammatesActivity.class));
+                                            } catch (IllegalStateException e) {
+                                                e.printStackTrace();
+                                                Toast.make(this, getString(R.string.error_parsin_data));
+                                            }
+                                        })
+                                        .setErrorListener(error -> {
+                                            System.out.println(new String(error.networkResponse.data));
+                                            Toast.make(this, getString(R.string.error_taking_all_games));
+                                            dialogInterface.cancel();
+                                        })
+                                        .addParam("locationId", String.valueOf(locationId))
+                                        .addParam("name", newTeamName)
+                                        .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                                        .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                                        .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+                                        .build(this));
+                    } else {
+                        Toast.make(this, getString(R.string.error_team_name_empty));
+                    }
+                })
+                .setNegativeButton(getString(R.string.modal_mode_button_cancel), (dialogInterface1, i1) -> {
+                    dialogInterface.cancel();
+                    dialogInterface1.cancel();
+                }).create();
+
+//        a.getWindow().setLayout(600, 300);
+//
+//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.paper1);
+//
+//        Drawable drawable = new BitmapDrawable(Bitmap.createScaledBitmap(bitmap, 600, 300, false));
+//
+//        a.getWindow().setBackgroundDrawable(drawable);
+
+        a.show();
+    }
+
+    private void alertDialogTeamPlayJoinTeam() {
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_select_team, null);
+
+        android.app.AlertDialog.Builder builder = new AlertDialog(this).getBuilder();
+        List<GameEntity> teams = new ArrayList<>();
+
+        ArrayAdapter<GameEntity> dataAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, teams);
+
+        builder.setTitle("Choose team")
+                .setView(viewInflated)
+                .setAdapter(dataAdapter, (dialog, which) -> {
+
+                    StoredData.saveString(this, StoredData.GAME_MODE, String.valueOf(PlayMode.TEAM));
+                    StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.PENDING));
+                    StoredData.saveInt(this, StoredData.GAME_ID, teams.get(which).getId());
+                    StoredData.saveString(this, StoredData.GAME_NAME, teams.get(which).getName());
+                    StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, false);
+
+                    startActivity(new Intent(this, WaitingTeammatesActivity.class));
+                });
+
+        android.app.AlertDialog instance = builder.create();
+        instance.show();
+
+        Button buttonRefreshTeamsList = viewInflated.findViewById(R.id.buttonRefreshTeamsList);
+        ProgressBar progressBarRefreshTeamsList = viewInflated.findViewById(R.id.progressBarRefreshTeamsList);
+
+        if (buttonRefreshTeamsList != null) {
+            buttonRefreshTeamsList.setOnClickListener((v) -> {
+                progressBarRefreshTeamsList.setVisibility(View.VISIBLE);
+                updateTeamsList(instance, progressBarRefreshTeamsList);
+            });
+        }
+
+        updateTeamsList(instance, progressBarRefreshTeamsList);
+    }
+
+    private void updateTeamsList(final android.app.AlertDialog instance, ProgressBar progressBarRefreshTeamsList) {
+        ArrayAdapter<GameEntity> adapter = (ArrayAdapter<GameEntity>) instance.getListView().getAdapter();
+        adapter.clear();
+        adapter.notifyDataSetChanged();
+        serverRequest.send(
+                new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_LIST_TEAMS)
+                        .setResponseListener(response -> {
+                            try {
+                                ArrayList<GameEntity> teamEntities = new Gson().fromJson(response, new TypeToken<ArrayList<GameEntity>>() {
+                                }.getType());
+                                adapter.clear();
+                                adapter.addAll(teamEntities);
+
+                                progressBarRefreshTeamsList.setVisibility(View.GONE);
+                                adapter.notifyDataSetChanged();
+                            } catch (IllegalStateException e) {
+                                e.printStackTrace();
+                                progressBarRefreshTeamsList.setVisibility(View.GONE);
+                                Toast.make(this, getString(R.string.error_parsin_data));
+                            }
+                        })
+                        .setErrorListener(error -> {
+                            System.out.println(new String(error.networkResponse.data));
+                            Toast.make(this, getString(R.string.error_taking_all_games));
+                        })
+                        .addParam("locationId", String.valueOf(locationId))
+                        .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                        .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                        .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+                        .build(this));
     }
 
 }
