@@ -63,7 +63,8 @@
             android:process=":time_travellers_location_checker" />
         <service
             android:name=".services.PlayAudioService"
-            android:enabled="true" />
+            android:enabled="true"
+            android:stopWithTask="true"/>
         <service
             android:name=".services.AuthenticatorService"
             android:exported="false">
