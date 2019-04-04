@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".WaitingTeammatesActivity"></activity>
+        <activity android:name=".WaitingTeammatesActivity" />
         <activity android:name=".GameMapActivity" />
         <activity android:name=".PlayModeActivity" />
         <activity android:name=".AllGamesActivity" />

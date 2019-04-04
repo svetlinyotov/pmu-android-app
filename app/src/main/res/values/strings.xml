@@ -47,4 +47,6 @@
     <string name="title_teammates">Teammates</string>
     <string name="error_team_name_empty">Enter team name</string>
     <string name="error_parsin_data">Error parsing data</string>
+    <string name="modal_enter_team_name">Enter team name</string>
+    <string name="button_refresh_list">Refresh list</string>
 </resources>

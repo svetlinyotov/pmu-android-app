@@ -10,11 +10,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -68,7 +71,7 @@ public class PlayModeActivity extends AppCompatActivity {
         buttonSettings.setOnClickListener((v) -> startActivity(new Intent(this, SettingsActivity.class)));
 
         buttonStartSinglePlayerGame.setOnClickListener((v) ->
-                new AlertDialog(this).getBuilder()
+                AlertDialog.styled(this, new AlertDialog(this).getBuilder()
                         .setTitle(getString(R.string.modal_mode_are_you_ready))
                         .setPositiveButton(getString(R.string.modal_mode_button_start_game), (dialogInterface, which) ->
                                 serverRequest.send(
@@ -102,7 +105,7 @@ public class PlayModeActivity extends AppCompatActivity {
 
                                 ))
                         .setNegativeButton("Cancel", (dialogInterface, which) -> dialogInterface.cancel())
-                        .show());
+                        .create()));
 
         buttonStartTeamPlayerGame.setOnClickListener((v) -> alertDialogTeamPlay());
     }
@@ -114,28 +117,19 @@ public class PlayModeActivity extends AppCompatActivity {
     }
 
     private void alertDialogTeamPlay() {
-        android.app.AlertDialog a = new AlertDialog(this).getBuilder()
-                .setTitle(getString(R.string.modal_mode_choose_option))
-                .setNeutralButton(getString(R.string.modal_mode_button_join_team), (dialogInterface, which) -> alertDialogTeamPlayJoinTeam())
-                .setPositiveButton(getString(R.string.modal_mode_button_team_create), (dialogInterface, i) -> alertDialogTeamPlayCreateTeam(dialogInterface))
-                .create();
-
-//        a.getWindow().setLayout(600, 300);
-//
-//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.paper1);
-//
-//        Drawable drawable = new BitmapDrawable(Bitmap.createScaledBitmap(bitmap, 600, 300, false));
-//
-//        a.getWindow().setBackgroundDrawable(drawable);
-
-        a.show();
+        AlertDialog.styled(this,
+                new AlertDialog(this).getBuilder()
+                        .setTitle(getString(R.string.modal_mode_choose_option))
+                        .setNeutralButton(getString(R.string.modal_mode_button_join_team), (dialogInterface, which) -> alertDialogTeamPlayJoinTeam())
+                        .setPositiveButton(getString(R.string.modal_mode_button_team_create), (dialogInterface, i) -> alertDialogTeamPlayCreateTeam(dialogInterface))
+                        .create());
     }
 
     private void alertDialogTeamPlayCreateTeam(DialogInterface dialogInterface) {
 
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_new_team_name, null);
 
-        android.app.AlertDialog a = new AlertDialog(this).getBuilder()
+        AlertDialog.styled(this, new AlertDialog(this).getBuilder()
                 .setView(viewInflated)
                 .setPositiveButton(getString(R.string.modal_mode_button_create), (dialogInterface1, i1) -> {
                     final EditText input = viewInflated.findViewById(R.id.editTextTeamName);
@@ -179,17 +173,8 @@ public class PlayModeActivity extends AppCompatActivity {
                 .setNegativeButton(getString(R.string.modal_mode_button_cancel), (dialogInterface1, i1) -> {
                     dialogInterface.cancel();
                     dialogInterface1.cancel();
-                }).create();
+                }).create());
 
-//        a.getWindow().setLayout(600, 300);
-//
-//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.paper1);
-//
-//        Drawable drawable = new BitmapDrawable(Bitmap.createScaledBitmap(bitmap, 600, 300, false));
-//
-//        a.getWindow().setBackgroundDrawable(drawable);
-
-        a.show();
     }
 
     private void alertDialogTeamPlayJoinTeam() {
@@ -200,7 +185,7 @@ public class PlayModeActivity extends AppCompatActivity {
         List<GameEntity> teams = new ArrayList<>();
 
         ArrayAdapter<GameEntity> dataAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, teams);
+                R.layout.dropdown_item_1line, teams);
 
         builder.setTitle("Choose team")
                 .setView(viewInflated)
@@ -216,7 +201,8 @@ public class PlayModeActivity extends AppCompatActivity {
                 });
 
         android.app.AlertDialog instance = builder.create();
-        instance.show();
+
+        AlertDialog.styled(this, instance);
 
         Button buttonRefreshTeamsList = viewInflated.findViewById(R.id.buttonRefreshTeamsList);
         ProgressBar progressBarRefreshTeamsList = viewInflated.findViewById(R.id.progressBarRefreshTeamsList);
