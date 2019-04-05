@@ -13,6 +13,7 @@ public interface URL {
     String GET_ALL_GAMES = PREFIX + "/ranking/personal";
     String START_SINGLE_PLAYER_GAME = PREFIX + "/game/start/single";
     String START_TEAM_PLAYER_GAME_CREATE_TEAM = PREFIX + "/game/start/team/create";
-    String START_TEAM_PLAYER_GAME_JOIN_TEAM = PREFIX + "/game/start/team/create";
+    String START_TEAM_PLAYER_GAME_JOIN_TEAM = PREFIX + "/game/start/team/join";
     String START_TEAM_PLAYER_GAME_LIST_TEAMS = PREFIX + "/game/start/team/list";
+    String GAME_LOCATION = PREFIX + "/game/location";
 }
