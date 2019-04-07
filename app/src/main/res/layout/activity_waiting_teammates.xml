@@ -20,7 +20,6 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginEnd="10dp"
-            android:layout_toEndOf="@id/buttonBack"
             android:fontFamily="@font/history_lowercase"
             android:gravity="center"
             android:text="@string/title_teammates"
@@ -38,18 +37,10 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:layout_toEndOf="@id/buttonBack"
         android:fontFamily="@font/history_lowercase"
         android:gravity="center"
         android:textAlignment="center"
         android:textSize="25sp" />
-
-    <ListView
-        android:id="@+id/listViewTeammates"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_above="@id/buttonStartTeamGame"
-        android:layout_below="@id/textViewTitleNewTeamName" />
 
     <Button
         android:id="@+id/buttonStartTeamGame"
@@ -60,6 +51,20 @@
         android:background="@drawable/button_gray_default"
         android:text="Button"
         android:textColor="#000" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/layoutSwipePlayers"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/textViewTitleNewTeamName"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="0dp">
+
+        <ListView
+            android:id="@+id/listViewTeammates"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
 </RelativeLayout>

@@ -96,8 +96,8 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
     private void sendLocation(Location location){
         serverRequest.send(
                 new RequestBuilder(Method.POST, URL.GAME_LOCATION)
-                        .addParam("Latitude", String.valueOf(location.getLatitude()))
-                        .addParam("Longitude",String.valueOf(location.getLongitude()))
+                        .addParam("latitude", String.valueOf(location.getLatitude()))
+                        .addParam("longitude",String.valueOf(location.getLongitude()))
                         .setErrorListener(error -> {
                             Log.d("GameMapActivity", "Failed to send location to server");
                         })
