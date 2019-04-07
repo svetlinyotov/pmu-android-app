@@ -39,7 +39,7 @@ public class StoredData {
         edit.apply();
     }
 
-    public static void saveBoolean(Context context, String key, Boolean value) {
+    public static void saveBoolean(Context context, String key, boolean value) {
         SharedPreferences.Editor edit = getSP(context).edit();
         edit.putBoolean(key, value);
         edit.apply();
