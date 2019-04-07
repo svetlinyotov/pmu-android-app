@@ -1,8 +1,16 @@
 package com.snsdevelop.tusofia.sem6.pmu;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +27,7 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +51,10 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
         ListView mListView = findViewById(R.id.listViewTeammates);
         List<String> players = new ArrayList<>();
         layoutSwipePlayers = findViewById(R.id.layoutSwipePlayers);
+        Button startGame = findViewById(R.id.buttonStartTeamGame);
+        TextView waitingHost = findViewById(R.id.textViewWaiting);
+        ProgressBar progressBar = findViewById(R.id.progressBar_cyclic);
+
 
         TextView textViewTitleNewTeamName = findViewById(R.id.textViewTitleNewTeamName);
         textViewTitleNewTeamName.setText(StoredData.getString(this, StoredData.GAME_NAME));
@@ -67,8 +80,24 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
                 }}
         );
 
-        pusherConnection.connect();
+        if(StoredData.getBoolean(this, StoredData.GAME_IS_TEAM_HOST)){
+            startGame.setVisibility(View.VISIBLE);
+            waitingHost.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+        }
+        else{
+            startGame.setVisibility(View.GONE);
+            waitingHost.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
 
+        }
+
+
+    }
+
+    @Override
+    public void onBackPressed(){
+        Toast.make(this, getString(R.string.waiting_to_start_game));
     }
 
     @Override
@@ -91,7 +120,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
                             layoutSwipePlayers.setRefreshing(false);
                         })
                         .setErrorListener(error -> {
-//                            Toast.make(this, getString(R.string.error_taking_player_list));
+                            Toast.make(this, getString(R.string.error_taking_player_list));
                             layoutSwipePlayers.setRefreshing(false);
                         })
                         .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
