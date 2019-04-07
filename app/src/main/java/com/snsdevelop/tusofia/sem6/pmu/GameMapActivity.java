@@ -18,11 +18,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.maps.android.ui.IconGenerator;
 import com.pusher.client.channel.SubscriptionEventListener;
 import com.snsdevelop.tusofia.sem6.pmu.Pusher.PusherConnection;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
@@ -79,6 +81,8 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         pusherConnection = new PusherConnection(this);
 
+        IconGenerator iconFactory = new IconGenerator(this);
+
         pusherConnection.bindChannelWithEvents(
                 PusherConnection.formatChannelName(PusherConnection.CHANNEL_USER_LOCATIONS, StoredData.getInt(this, StoredData.GAME_ID)),
                 new HashMap<String, SubscriptionEventListener>() {{
@@ -94,10 +98,12 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                             if (mMap != null) {
                                 if (!userId.equals(currentUserId)) {
                                     if (!usersMarkers.containsKey(userId)) {
+
                                         Marker marker = mMap.addMarker(new MarkerOptions()
-                                                .title(userNames)
-                                                .snippet(userNames)
+//                                                .title(userNames)
+                                                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(userNames)))
                                                 .position(new LatLng(latitude, longitude))
+                                                .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
                                                 .visible(true)
                                         );
 

@@ -97,7 +97,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
                 Log.d("KUR", c.getTitle() + " " + c.getTag());
                 Log.d("KUR", String.valueOf(lastLocation.distanceTo(a)));
 
-                if (lastLocation.distanceTo(a) < 20000) {
+                if (lastLocation.distanceTo(a) < 2000099999) {
                     startGame.setVisibility(View.VISIBLE);
                     textStartGame.setVisibility(View.VISIBLE);
                 } else {
