@@ -76,7 +76,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        Toast.make(this, getString(R.string.waiting_to_start_game));
+        Toast.make(this, getString(R.string.error_going_back));
     }
 
     private void updatePlayerList() {
