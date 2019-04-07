@@ -12,7 +12,7 @@ import androidx.room.Query;
 @Dao
 public interface AllGamesDao {
 
-    @Query("SELECT * from games ORDER BY total DESC")
+    @Query("SELECT * from games ORDER BY total DESC, locationId DESC, names DESC")
     List<AllGamesEntity> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

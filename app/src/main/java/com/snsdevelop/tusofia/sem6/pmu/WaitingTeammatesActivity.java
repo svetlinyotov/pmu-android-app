@@ -1,26 +1,27 @@
 package com.snsdevelop.tusofia.sem6.pmu;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.FieldNamingPolicy;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.pusher.client.channel.SubscriptionEventListener;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.PlayerEntity;
+import com.snsdevelop.tusofia.sem6.pmu.Pusher.PusherConnection;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
-import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
     private Request serverRequest;
     private ArrayAdapter<String> playersAdapter;
     private SwipeRefreshLayout layoutSwipePlayers;
+    private PusherConnection pusherConnection;
 
 
     @Override
@@ -50,7 +52,29 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
         updatePlayerList();
         layoutSwipePlayers.setOnRefreshListener(this::updatePlayerList);
 
+        pusherConnection = new PusherConnection(this);
 
+        pusherConnection.bindChannelWithEvents(
+                PusherConnection.formatChannelName(PusherConnection.CHANNEL_NEW_TEAMMATES, StoredData.getInt(this, StoredData.GAME_ID)),
+                new HashMap<String, SubscriptionEventListener>() {{
+                    put(PusherConnection.EVENT_NEW_TEAMMATE, (String channelName, String eventName, final String data) -> {
+                        JsonObject info = new Gson().fromJson(data, JsonObject.class);
+                        runOnUiThread(() -> {
+                            playersAdapter.add(info.get("name").getAsString());
+                            playersAdapter.notifyDataSetChanged();
+                        });
+                    });
+                }}
+        );
+
+        pusherConnection.connect();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        pusherConnection.disconnect();
     }
 
     private void updatePlayerList() {
@@ -67,7 +91,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
                             layoutSwipePlayers.setRefreshing(false);
                         })
                         .setErrorListener(error -> {
-                            Toast.make(this, getString(R.string.error_taking_player_list));
+//                            Toast.make(this, getString(R.string.error_taking_player_list));
                             layoutSwipePlayers.setRefreshing(false);
                         })
                         .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))

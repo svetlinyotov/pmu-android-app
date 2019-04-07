@@ -6,6 +6,7 @@
     <string name="google_web_client_secret">18FWZ-cp81ZPpPsMdVzqrSt8</string>
     <string name="facebook_app_id">692595817867486</string>
     <string name="fb_login_protocol_scheme">fb692595817867486</string>
+    <string name="pusher_api_key">b48af87a9c4558f9e809</string>
 
     <string name="modal_login_on_cancel">Login canceled</string>
     <string name="modal_internet_error_title">Internet connection error</string>
@@ -52,4 +53,5 @@
     <string name="modal_enter_team_name">Enter team name</string>
     <string name="button_refresh_list">Refresh list</string>
     <string name="button_camera">Scan a QR code</string>
+    <string name="error_creating_team">Error creating team. Try again</string>
 </resources>

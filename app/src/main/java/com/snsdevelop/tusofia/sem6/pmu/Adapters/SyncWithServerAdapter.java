@@ -107,6 +107,7 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
                                     }.getType());
 
 
+                            allGamesRepository.deleteAll();
                             for (AllGamesEntity allGamesEntity : allGamesEntityList) {
                                 allGamesRepository.insert(allGamesEntity);
                             }
