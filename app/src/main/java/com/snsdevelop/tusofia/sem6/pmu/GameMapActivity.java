@@ -30,6 +30,7 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -135,6 +136,11 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         mMap = googleMap;
         enableMyLocationIfPermitted();
 
+    }
+
+    @Override
+    public void onBackPressed(){
+        Toast.make(this, getString(R.string.error_going_back));
     }
 
     private void enableMyLocationIfPermitted() {

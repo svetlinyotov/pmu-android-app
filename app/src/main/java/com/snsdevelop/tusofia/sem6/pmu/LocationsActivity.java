@@ -42,6 +42,9 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.PlayMode;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
@@ -94,7 +97,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
                 Log.d("KUR", c.getTitle() + " " + c.getTag());
                 Log.d("KUR", String.valueOf(lastLocation.distanceTo(a)));
 
-                if (lastLocation.distanceTo(a) < 200009999) {
+                if (lastLocation.distanceTo(a) < 20000) {
                     startGame.setVisibility(View.VISIBLE);
                     textStartGame.setVisibility(View.VISIBLE);
                 } else {
@@ -116,10 +119,25 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         serverRequest = new Request(this);
         locationsViewModel = ViewModelProviders.of(this).get(LocationsViewModel.class);
 
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
+        if ((StoredData.getInt(this, StoredData.GAME_ID) != -1) &&
+                !(StoredData.getString(this, StoredData.GAME_STATUS).equals(String.valueOf(GameStatus.FINISHED)))) {
+            if (StoredData.getString(this, StoredData.GAME_STATUS).equals(String.valueOf(GameStatus.PENDING))) {
+                startActivity(new Intent(this, WaitingTeammatesActivity.class));
+            } else if (StoredData.getString(this, StoredData.GAME_STATUS).equals(String.valueOf(GameStatus.RUNNING))) {
+                startActivity(new Intent(this, GameMapActivity.class));
+            }
+        } else {
+            StoredData.saveString(this, StoredData.GAME_MODE, null);
+            StoredData.saveString(this, StoredData.GAME_STATUS, null);
+            StoredData.saveInt(this, StoredData.GAME_ID, -1);
+            StoredData.saveString(this, StoredData.GAME_NAME, null);
+            StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, null);
         }
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        if (mapFragment != null)
+            mapFragment.getMapAsync(this);
 
 
         startGame = findViewById(R.id.buttonStartGame);

@@ -54,7 +54,7 @@
     <string name="button_refresh_list">Refresh list</string>
     <string name="button_camera">Scan a QR code</string>
     <string name="waiting_to_start_game">Waiting for host to start game &#8230;</string>
-    <string name="error_going_back">You can\'t go back while waiting for teammates</string>
+    <string name="error_going_back">You can\'t go back.</string>
 
     <string name="error_creating_team">Error creating team. Try again</string>
     <string name="error_failed_send_location_to_server">Failed to send location to server</string>
