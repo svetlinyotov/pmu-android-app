@@ -48,6 +48,9 @@
     <string name="modal_mode_button_cancel">Cancel</string>
     <string name="modal_mode_button_join_team">Join Team</string>
     <string name="title_teammates">Teammates</string>
+    <string name="are_you_sure">Are you sure you want to give up?</string>
+    <string name="answer_yes">Yes</string>
+    <string name="answer_no">No</string>
     <string name="error_team_name_empty">Enter team name</string>
     <string name="error_parsin_data">Error parsing data</string>
     <string name="modal_enter_team_name">Enter team name</string>

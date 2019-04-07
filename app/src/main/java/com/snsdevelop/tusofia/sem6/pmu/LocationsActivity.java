@@ -119,7 +119,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         serverRequest = new Request(this);
         locationsViewModel = ViewModelProviders.of(this).get(LocationsViewModel.class);
 
-        if ((StoredData.getInt(this, StoredData.GAME_ID) != -1) &&
+        if ((StoredData.getInt(this, StoredData.GAME_ID) != -1) && (StoredData.getString(this, StoredData.GAME_STATUS) != null) &&
                 !(StoredData.getString(this, StoredData.GAME_STATUS).equals(String.valueOf(GameStatus.FINISHED)))) {
             if (StoredData.getString(this, StoredData.GAME_STATUS).equals(String.valueOf(GameStatus.PENDING))) {
                 startActivity(new Intent(this, WaitingTeammatesActivity.class));
@@ -131,7 +131,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
             StoredData.saveString(this, StoredData.GAME_STATUS, null);
             StoredData.saveInt(this, StoredData.GAME_ID, -1);
             StoredData.saveString(this, StoredData.GAME_NAME, null);
-            StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, null);
+            StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, false);
         }
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()

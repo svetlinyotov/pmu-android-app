@@ -1,10 +1,12 @@
 package com.snsdevelop.tusofia.sem6.pmu;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -29,6 +31,8 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.AlertDialog;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
@@ -67,6 +71,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         setContentView(R.layout.activity_game_map);
 
         String currentUserId = StoredData.getString(this, StoredData.LOGGED_USER_ID);
+        ImageButton buttonGiveUp = findViewById(R.id.buttonGiveUp);
 
         serverRequest = new Request(this);
 
@@ -74,6 +79,16 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        buttonGiveUp.setOnClickListener((v) ->
+                AlertDialog.styled(this, new AlertDialog(this).getBuilder()
+                                .setTitle(getString(R.string.are_you_sure))
+                                .setPositiveButton(getString(R.string.answer_yes), (dialogInterface, which) -> {
+                                    StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.FINISHED));
+                                    startActivity(new Intent(this, LocationsActivity.class));
+                                        })
+                                .setNegativeButton(getString(R.string.answer_no), (dialogInterface, which) -> dialogInterface.cancel())
+                                .create()));
 
         usersMarkers = new HashMap<>();
 
