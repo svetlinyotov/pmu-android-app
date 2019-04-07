@@ -52,4 +52,7 @@
     <string name="modal_enter_team_name">Enter team name</string>
     <string name="button_refresh_list">Refresh list</string>
     <string name="button_camera">Scan a QR code</string>
+    <string name="waiting_to_start_game">Waiting for host to start game &#8230;</string>
+    <string name="error_going_back">You can\'t go back while waiting for teammates</string>
+
 </resources>

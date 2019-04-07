@@ -3,9 +3,14 @@ package com.snsdevelop.tusofia.sem6.pmu;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.FieldNamingPolicy;
@@ -40,6 +45,10 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
         ListView mListView = findViewById(R.id.listViewTeammates);
         List<String> players = new ArrayList<>();
         layoutSwipePlayers = findViewById(R.id.layoutSwipePlayers);
+        Button startGame = findViewById(R.id.buttonStartTeamGame);
+        TextView waitingHost = findViewById(R.id.textViewWaiting);
+        ProgressBar progressBar = findViewById(R.id.progressBar_cyclic);
+
 
         TextView textViewTitleNewTeamName = findViewById(R.id.textViewTitleNewTeamName);
         textViewTitleNewTeamName.setText(StoredData.getString(this, StoredData.GAME_NAME));
@@ -50,7 +59,24 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
         updatePlayerList();
         layoutSwipePlayers.setOnRefreshListener(this::updatePlayerList);
 
+        if(StoredData.getBoolean(this, StoredData.GAME_IS_TEAM_HOST)){
+            startGame.setVisibility(View.VISIBLE);
+            waitingHost.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+        }
+        else{
+            startGame.setVisibility(View.GONE);
+            waitingHost.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
 
+        }
+
+
+    }
+
+    @Override
+    public void onBackPressed(){
+        Toast.make(this, getString(R.string.waiting_to_start_game));
     }
 
     private void updatePlayerList() {
