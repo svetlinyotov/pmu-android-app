@@ -54,4 +54,5 @@
     <string name="button_refresh_list">Refresh list</string>
     <string name="button_camera">Scan a QR code</string>
     <string name="error_creating_team">Error creating team. Try again</string>
+    <string name="error_failed_send_location_to_server">Failed to send location to server</string>
 </resources>

@@ -42,6 +42,7 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
     private RelativeLayout progressBar;
     private LocationsViewModel locationsViewModel;
     private LinkedList<Marker> markers = new LinkedList<>();
+    FusedLocationProviderClient fusedLocationClient;
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -114,10 +116,10 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
         serverRequest = new Request(this);
         locationsViewModel = ViewModelProviders.of(this).get(LocationsViewModel.class);
 
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        if (mapFragment != null)
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
             mapFragment.getMapAsync(this);
+        }
 
 
         startGame = findViewById(R.id.buttonStartGame);
@@ -199,17 +201,16 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
     protected void onStop() {
         super.onStop();
         serverRequest.stop();
+        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enableMyLocationIfPermitted();
-                } else {
-                    showDefaultLocation();
-                }
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                enableMyLocationIfPermitted();
+            } else {
+                showDefaultLocation();
             }
         }
     }
@@ -311,7 +312,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         } else if (mMap != null) {
 
-            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
             fusedLocationClient.requestLocationUpdates(
                     new LocationRequest().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(10),

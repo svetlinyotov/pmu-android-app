@@ -142,22 +142,20 @@ public class MainActivity extends Activity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
         Log.d(TAG, requestCode + " " + resultCode + " " + data);
-        switch (requestCode) {
-            case GOOGLE_RESPONCE_CODE:
-                try {
-                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                    GoogleSignInAccount account = task.getResult(ApiException.class);
-                    if (account != null && Auth.signIn(this, AuthOrigin.GOOGLE, account.getEmail(), account.getDisplayName(), account.getId(), account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null, account.getIdToken())) {
-                        sendLoggedUserToServer(AuthOrigin.GOOGLE, account.getEmail(), account.getDisplayName(), account.getId(), account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null, account.getIdToken());
-                    } else {
-                        Toast.make(this, "Cannot sign to google");
-                    }
-                } catch (ApiException e) {
-                    e.printStackTrace();
-                    Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-                    new AlertDialog(MainActivity.this).getBuilder().setTitle(getResources().getString(R.string.modal_login_auth_error)).setMessage(getResources().getString(R.string.modal_login_error_google)).show();
+        if (requestCode == GOOGLE_RESPONCE_CODE) {
+            try {
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if (account != null && Auth.signIn(this, AuthOrigin.GOOGLE, account.getEmail(), account.getDisplayName(), account.getId(), account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null, account.getIdToken())) {
+                    sendLoggedUserToServer(AuthOrigin.GOOGLE, account.getEmail(), account.getDisplayName(), account.getId(), account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null, account.getIdToken());
+                } else {
+                    Toast.make(this, "Cannot sign to google");
                 }
-                break;
+            } catch (ApiException e) {
+                e.printStackTrace();
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                new AlertDialog(MainActivity.this).getBuilder().setTitle(getResources().getString(R.string.modal_login_auth_error)).setMessage(getResources().getString(R.string.modal_login_error_google)).show();
+            }
         }
     }
 
@@ -230,7 +228,8 @@ public class MainActivity extends Activity {
                 new RequestBuilder(Method.POST, URL.OAUTH_LOGIN)
                         .setResponseListener(response -> onLoggedIn())
                         .setErrorListener(error -> {
-                                    Log.d(TAG, new String(error.networkResponse.data));
+                                    if (error.networkResponse != null)
+                                        Log.d(TAG, new String(error.networkResponse.data));
 
                                     mainPreloadView.setVisibility(View.GONE);
 

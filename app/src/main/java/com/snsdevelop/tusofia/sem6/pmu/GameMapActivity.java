@@ -1,16 +1,14 @@
 package com.snsdevelop.tusofia.sem6.pmu;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -20,12 +18,21 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.pusher.client.channel.SubscriptionEventListener;
+import com.snsdevelop.tusofia.sem6.pmu.Pusher.PusherConnection;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.snsdevelop.tusofia.sem6.pmu.Utils.PermissionCheck.LOCATION_PERMISSION_REQUEST_CODE;
 
@@ -34,6 +41,9 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
     private Request serverRequest;
+    private PusherConnection pusherConnection;
+    private Map<String, Marker> usersMarkers;
+    private FusedLocationProviderClient fusedLocationClient;
 
     LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -55,18 +65,69 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_map);
 
+        String currentUserId = StoredData.getString(this, StoredData.LOGGED_USER_ID);
+
         serverRequest = new Request(this);
 
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.mapInGameMode);
-        if (mapFragment != null)
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapInGameMode);
+        if (mapFragment != null) {
             mapFragment.getMapAsync(this);
+        }
+
+        usersMarkers = new HashMap<>();
+
+        pusherConnection = new PusherConnection(this);
+
+        pusherConnection.bindChannelWithEvents(
+                PusherConnection.formatChannelName(PusherConnection.CHANNEL_USER_LOCATIONS, StoredData.getInt(this, StoredData.GAME_ID)),
+                new HashMap<String, SubscriptionEventListener>() {{
+                    put(PusherConnection.EVENT_USER_LOCATION, (String channelName, String eventName, final String data) -> {
+                        JsonObject info = new Gson().fromJson(data, JsonObject.class);
+
+                        String userId = info.get("userId").getAsString();
+                        String userNames = info.get("userNames").getAsString();
+                        double latitude = info.get("latitude").getAsDouble();
+                        double longitude = info.get("longitude").getAsDouble();
+
+                        runOnUiThread(() -> {
+                            if (mMap != null) {
+                                if (!userId.equals(currentUserId)) {
+                                    if (!usersMarkers.containsKey(userId)) {
+                                        Marker marker = mMap.addMarker(new MarkerOptions()
+                                                .title(userNames)
+                                                .snippet(userNames)
+                                                .position(new LatLng(latitude, longitude))
+                                                .visible(true)
+                                        );
+
+                                        marker.showInfoWindow();
+
+                                        usersMarkers.put(userId, marker);
+                                    } else {
+                                        Marker m = usersMarkers.get(userId);
+                                        m.setPosition(new LatLng(latitude, longitude));
+                                        m.showInfoWindow();
+                                    }
+                                }
+                            }
+
+                        });
+                    });
+                }}
+        );
+
+        pusherConnection.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         serverRequest.stop();
+        pusherConnection.disconnect();
+
+        if (fusedLocationClient != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
     }
 
     @Override
@@ -81,7 +142,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         } else if (mMap != null) {
 
-            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
             fusedLocationClient.requestLocationUpdates(
                     new LocationRequest().setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY).setInterval(10),
@@ -96,11 +157,10 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
     private void sendLocation(Location location){
         serverRequest.send(
                 new RequestBuilder(Method.POST, URL.GAME_LOCATION)
+                        .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
                         .addParam("latitude", String.valueOf(location.getLatitude()))
                         .addParam("longitude",String.valueOf(location.getLongitude()))
-                        .setErrorListener(error -> {
-                            Log.d("GameMapActivity", "Failed to send location to server");
-                        })
+                        .setErrorListener(error -> Log.d("GameMapActivity", getString(R.string.error_failed_send_location_to_server)))
                         .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
                         .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
                         .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
