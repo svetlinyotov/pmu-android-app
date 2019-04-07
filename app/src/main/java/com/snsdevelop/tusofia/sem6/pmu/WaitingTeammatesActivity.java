@@ -1,14 +1,10 @@
 package com.snsdevelop.tusofia.sem6.pmu;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import android.graphics.drawable.AnimationDrawable;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,12 +22,14 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class WaitingTeammatesActivity extends AppCompatActivity {
@@ -47,19 +45,19 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waiting_teammates);
-        serverRequest = new Request(this);
         ListView mListView = findViewById(R.id.listViewTeammates);
         List<String> players = new ArrayList<>();
-        layoutSwipePlayers = findViewById(R.id.layoutSwipePlayers);
         Button startGame = findViewById(R.id.buttonStartTeamGame);
         TextView waitingHost = findViewById(R.id.textViewWaiting);
         ProgressBar progressBar = findViewById(R.id.progressBar_cyclic);
-
-
         TextView textViewTitleNewTeamName = findViewById(R.id.textViewTitleNewTeamName);
+
+        serverRequest = new Request(this);
+        layoutSwipePlayers = findViewById(R.id.layoutSwipePlayers);
+
+
         textViewTitleNewTeamName.setText(StoredData.getString(this, StoredData.GAME_NAME));
-        playersAdapter = new ArrayAdapter<>(this,
-                R.layout.waiting_teammates_adapter_view, players);
+        playersAdapter = new ArrayAdapter<>(this, R.layout.waiting_teammates_adapter_view, players);
         mListView.setAdapter(playersAdapter);
 
         updatePlayerList();
@@ -67,36 +65,56 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
 
         pusherConnection = new PusherConnection(this);
 
+        Map<String, SubscriptionEventListener> events = new HashMap<>();
+        events.put(PusherConnection.EVENT_NEW_TEAMMATE, (String channelName, String eventName, final String data) -> {
+            JsonObject info = new Gson().fromJson(data, JsonObject.class);
+            runOnUiThread(() -> {
+                playersAdapter.add(info.get("name").getAsString());
+                playersAdapter.notifyDataSetChanged();
+            });
+        });
+
+        events.put(PusherConnection.EVENT_TEAM_GAME_START, (String channelName, String eventName, final String data) ->
+                runOnUiThread(() -> {
+                    StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.RUNNING));
+                    startActivity(new Intent(this, GameMapActivity.class));
+                }));
+
         pusherConnection.bindChannelWithEvents(
                 PusherConnection.formatChannelName(PusherConnection.CHANNEL_NEW_TEAMMATES, StoredData.getInt(this, StoredData.GAME_ID)),
-                new HashMap<String, SubscriptionEventListener>() {{
-                    put(PusherConnection.EVENT_NEW_TEAMMATE, (String channelName, String eventName, final String data) -> {
-                        JsonObject info = new Gson().fromJson(data, JsonObject.class);
-                        runOnUiThread(() -> {
-                            playersAdapter.add(info.get("name").getAsString());
-                            playersAdapter.notifyDataSetChanged();
-                        });
-                    });
-                }}
+                events
         );
 
-        if(StoredData.getBoolean(this, StoredData.GAME_IS_TEAM_HOST)){
+        pusherConnection.connect();
+
+        startGame.setOnClickListener((v) ->
+                serverRequest.send(
+                        new RequestBuilder(Method.POST, URL.GAME_START_TEAM_PLAY)
+                                .setResponseListener(response -> {
+
+                                    StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.RUNNING));
+                                    startActivity(new Intent(this, GameMapActivity.class));
+                                })
+                                .setErrorListener(error -> Toast.make(this, getString(R.string.error_staring_game)))
+                                .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
+                                .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                                .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                                .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+                                .build(this)));
+
+        if (StoredData.getBoolean(this, StoredData.GAME_IS_TEAM_HOST)) {
             startGame.setVisibility(View.VISIBLE);
             waitingHost.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
-        }
-        else{
+        } else {
             startGame.setVisibility(View.GONE);
             waitingHost.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.VISIBLE);
-
         }
-
-
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         Toast.make(this, getString(R.string.waiting_to_start_game));
     }
 

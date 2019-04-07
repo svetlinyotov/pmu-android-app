@@ -16,7 +16,7 @@
         android:background="@drawable/button_gray_default"
         android:text="@string/modal_mode_button_start_game"
         android:textColor="#000"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 
     <RelativeLayout
@@ -40,6 +40,35 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/relativeLayoutWaitingText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <ProgressBar
+            android:id="@+id/progressBar_cyclic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="15dp"
+            android:minWidth="50dp"
+            android:minHeight="50dp" />
+
+        <TextView
+            android:id="@+id/textViewWaiting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@id/progressBar_cyclic"
+            android:text="@string/waiting_to_start_game"
+            android:textColor="#FFFFFF"
+            android:textSize="23sp" />
+
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/textViewTitleNewTeamName"
         android:layout_width="wrap_content"
@@ -53,31 +82,12 @@
         android:textAlignment="center"
         android:textSize="25sp" />
 
-    <TextView
-        android:id="@+id/textViewWaiting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="30dp"
-        android:text="@string/waiting_to_start_game"
-        android:textColor="#FFFFFF"
-        android:textSize="23sp" />
-
-    <ProgressBar
-        android:id="@+id/progressBar_cyclic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="50dp"
-        android:minWidth="50dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/layoutSwipePlayers"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_above="@id/relativeLayoutWaitingText"
         android:layout_below="@id/textViewTitleNewTeamName"
-        android:layout_alignParentBottom="true"
         android:layout_marginEnd="0dp">
 
         <ListView
