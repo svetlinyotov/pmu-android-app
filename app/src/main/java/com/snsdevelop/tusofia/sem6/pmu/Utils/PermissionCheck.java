@@ -11,6 +11,7 @@ public class PermissionCheck {
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     public static final int STORAGE_PERMISSION_REQUEST_CODE = 2;
+    public static final int CAMERA_PERMISSION_REQUEST_CODE = 7;
 
     public static boolean fetchUserFineLocation(Context context) {
 //        if (Build.VERSION.SDK_INT <= 23) return true;
@@ -73,6 +74,16 @@ public class PermissionCheck {
     public static boolean sendSms(Context context) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.SEND_SMS}, 6);
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    public static boolean cameraUse(Context context) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.CAMERA}, 7);
             return false;
         } else {
             return true;

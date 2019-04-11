@@ -74,6 +74,11 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         String currentUserId = StoredData.getString(this, StoredData.LOGGED_USER_ID);
         ImageButton buttonGiveUp = findViewById(R.id.buttonGiveUp);
+        ImageButton buttonCamera = findViewById(R.id.buttonCamera);
+
+        buttonCamera.setOnClickListener((v) -> {
+            startActivity(new Intent(this, QRCameraActivity.class));
+        });
 
         serverRequest = new Request(this);
 
