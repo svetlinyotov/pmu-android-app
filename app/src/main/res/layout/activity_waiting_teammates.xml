@@ -44,6 +44,7 @@
         android:id="@+id/relativeLayoutWaitingText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:layout_alignParentBottom="true">
 
         <ProgressBar
@@ -82,11 +83,19 @@
         android:textAlignment="center"
         android:textSize="25sp" />
 
+    <Button
+        android:id="@+id/buttonCancelTeamPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/relativeLayoutWaitingText"
+        android:layout_centerHorizontal="true"
+        android:text="@string/button_cancel" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/layoutSwipePlayers"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_above="@id/relativeLayoutWaitingText"
+        android:layout_above="@id/buttonCancelTeamPlay"
         android:layout_below="@id/textViewTitleNewTeamName"
         android:layout_marginEnd="0dp">
 

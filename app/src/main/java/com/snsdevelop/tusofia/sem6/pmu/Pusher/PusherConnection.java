@@ -15,6 +15,7 @@ public class PusherConnection {
     public static final String CHANNEL_NEW_TEAMMATES = "player-to-team-game-{id}-channel";
     public static final String CHANNEL_USER_LOCATIONS = "user-location-game-{id}-channel";
     public static final String EVENT_NEW_TEAMMATE = "App\\Events\\Pusher\\BroadcastNewPlayerToTeam";
+    public static final String EVENT_REMOVE_TEAMMATE = "App\\Events\\Pusher\\BroadcastRemovePlayerFromTeam";
     public static final String EVENT_TEAM_GAME_START = "App\\Events\\Pusher\\BroadcastTeamGameStart";
     public static final String EVENT_USER_LOCATION = "App\\Events\\Pusher\\BroadcastUserLocation";
 

@@ -62,4 +62,5 @@
     <string name="error_failed_send_location_to_server">Failed to send location to server</string>
     <string name="error_staring_game">Error starting game</string>
     <string name="title_qrmarkers">Markers</string>
+    <string name="button_cancel">Cancel</string>
 </resources>

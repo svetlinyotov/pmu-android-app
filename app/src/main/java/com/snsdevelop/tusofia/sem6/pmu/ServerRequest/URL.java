@@ -14,6 +14,7 @@ public interface URL {
     String START_SINGLE_PLAYER_GAME = PREFIX + "/game/start/single";
     String START_TEAM_PLAYER_GAME_CREATE_TEAM = PREFIX + "/game/start/team/create";
     String START_TEAM_PLAYER_GAME_JOIN_TEAM = PREFIX + "/game/start/team/join";
+    String START_TEAM_PLAYER_GAME_UN_JOIN_TEAM = PREFIX + "/game/start/team/unJoin";
     String START_TEAM_PLAYER_GAME_LIST_TEAMS = PREFIX + "/game/start/team/list";
     String GAME_LOCATION = PREFIX + "/game/location";
     String GAME_START_TEAM_PLAY = PREFIX + "/game/start/team/start";

@@ -51,6 +51,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
         TextView waitingHost = findViewById(R.id.textViewWaiting);
         ProgressBar progressBar = findViewById(R.id.progressBar_cyclic);
         TextView textViewTitleNewTeamName = findViewById(R.id.textViewTitleNewTeamName);
+        Button buttonCancelTeamPlay = findViewById(R.id.buttonCancelTeamPlay);
 
         serverRequest = new Request(this);
         layoutSwipePlayers = findViewById(R.id.layoutSwipePlayers);
@@ -70,6 +71,14 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
             JsonObject info = new Gson().fromJson(data, JsonObject.class);
             runOnUiThread(() -> {
                 playersAdapter.add(info.get("name").getAsString());
+                playersAdapter.notifyDataSetChanged();
+            });
+        });
+
+        events.put(PusherConnection.EVENT_REMOVE_TEAMMATE, (String channelName, String eventName, final String data) -> {
+            JsonObject info = new Gson().fromJson(data, JsonObject.class);
+            runOnUiThread(() -> {
+                playersAdapter.remove(info.get("name").getAsString());
                 playersAdapter.notifyDataSetChanged();
             });
         });
@@ -102,6 +111,24 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
                                 .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
                                 .build(this)));
 
+        buttonCancelTeamPlay.setOnClickListener((v) ->
+                serverRequest.send(
+                        new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_UN_JOIN_TEAM)
+                                .setResponseListener(response -> {
+                                    StoredData.saveString(this, StoredData.GAME_MODE, null);
+                                    StoredData.saveString(this, StoredData.GAME_STATUS, null);
+                                    StoredData.saveInt(this, StoredData.GAME_ID, -1);
+                                    StoredData.saveString(this, StoredData.GAME_NAME, null);
+                                    StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, false);
+                                    startActivity(new Intent(this, LocationsActivity.class));
+                                })
+                                .setErrorListener(error -> Toast.make(this, getString(R.string.error_staring_game)))
+                                .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
+                                .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                                .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                                .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+                                .build(this)));
+
         if (StoredData.getBoolean(this, StoredData.GAME_IS_TEAM_HOST)) {
             startGame.setVisibility(View.VISIBLE);
             waitingHost.setVisibility(View.GONE);
@@ -114,7 +141,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         Toast.make(this, getString(R.string.error_going_back));
     }
 
