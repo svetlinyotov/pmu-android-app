@@ -10,7 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".QRCameraActivity"></activity>
+        <activity android:name=".FoundQRMarkersActivity"></activity>
+        <activity android:name=".QRCameraActivity" />
         <activity android:name=".WaitingTeammatesActivity" />
         <activity android:name=".GameMapActivity" />
         <activity android:name=".PlayModeActivity" />
@@ -27,7 +28,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -44,10 +44,10 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
-
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -60,6 +60,7 @@
             android:authorities="com.snsdevelop.tusofia.sem6.pmu"
             android:exported="false"
             android:syncable="true" />
+
         <service
             android:name=".services.LocationBackgroundService"
             android:process=":time_travellers_location_checker" />
@@ -78,7 +79,6 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/sync_with_server_authenticator" />
         </service>
-
         <service
             android:name=".services.SyncWithServerService"
             android:exported="false"
@@ -95,12 +95,12 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
