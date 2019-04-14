@@ -160,8 +160,10 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                                         usersMarkers.put(userId, marker);
                                     } else {
                                         Marker m = usersMarkers.get(userId);
-                                        m.setPosition(new LatLng(latitude, longitude));
-                                        m.showInfoWindow();
+                                        if (m != null) {
+                                            m.setPosition(new LatLng(latitude, longitude));
+                                            m.showInfoWindow();
+                                        }
                                     }
                                 }
                             }
@@ -176,13 +178,19 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode,resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
+
+                //TODO: send request to server /game/qr with param "qrCode": <String>
+                // if success 200OK display popup and update isFound in DB
+                // if error
+                //      if error.networkResponse != null && error.networkResponse.data == "QR_ALREADY_FOUND" -> display alert dialog with message that the qr code is already found
+                //      else display alert dialog with message that the QR code is invalid
                 String result = data.getStringExtra("barcode");
 
-                List<QRMarkerEntity> QRMarker = QRMarkersViewModel.getMarker(result);
+                List<QRMarkerEntity> QRMarkers = QRMarkersViewModel.getMarker(result);
 
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
                 View popup = inflater.inflate(R.layout.qr_marker_popup, null);
@@ -206,9 +214,14 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                     }
                 });
 
-                webView.loadUrl("https://facebook.com");
+                Map<String, String> headers = new HashMap<>();
 
+                headers.put("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN));
+                headers.put("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN));
+                headers.put("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID));
 
+                //TODO: here replace 2 with the marker ID
+                webView.loadUrl("https://snsdevelop.com/time-travellers/api/v1/app/game/qr/" + 2, headers);
             }
         }
     }

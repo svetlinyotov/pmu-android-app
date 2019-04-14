@@ -112,6 +112,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
                                 .build(this)));
 
         buttonCancelTeamPlay.setOnClickListener((v) ->
+                //TODO send the request after AlertDialog confirmation
                 serverRequest.send(
                         new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_UN_JOIN_TEAM)
                                 .setResponseListener(response -> {
