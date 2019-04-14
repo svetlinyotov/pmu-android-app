@@ -183,7 +183,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
 
-                //TODO: send request to server /game/qr with param "qrCode": <String>
+                //TODO: send request to server /game/qr with params "qrCode": <String> and "gameId": <int>
                 // if success 200OK display popup and update isFound in DB
                 // if error
                 //      if error.networkResponse != null && error.networkResponse.data == "QR_ALREADY_FOUND" -> display alert dialog with message that the qr code is already found
