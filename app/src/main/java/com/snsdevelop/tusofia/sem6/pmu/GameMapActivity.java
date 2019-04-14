@@ -131,46 +131,62 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         IconGenerator iconFactory = new IconGenerator(this);
 
-        pusherConnection.bindChannelWithEvents(
-                PusherConnection.formatChannelName(PusherConnection.CHANNEL_USER_LOCATIONS, StoredData.getInt(this, StoredData.GAME_ID)),
-                new HashMap<String, SubscriptionEventListener>() {{
-                    put(PusherConnection.EVENT_USER_LOCATION, (String channelName, String eventName, final String data) -> {
-                        JsonObject info = new Gson().fromJson(data, JsonObject.class);
+        Map<String, SubscriptionEventListener> pusherEvents = new HashMap<>();
+        pusherEvents.put(PusherConnection.EVENT_USER_LOCATION, (String channelName, String eventName, final String data) -> {
+            JsonObject info = new Gson().fromJson(data, JsonObject.class);
 
-                        String userId = info.get("userId").getAsString();
-                        String userNames = info.get("userNames").getAsString();
-                        double latitude = info.get("latitude").getAsDouble();
-                        double longitude = info.get("longitude").getAsDouble();
+            String userId = info.get("userId").getAsString();
+            String userNames = info.get("userNames").getAsString();
+            double latitude = info.get("latitude").getAsDouble();
+            double longitude = info.get("longitude").getAsDouble();
 
-                        runOnUiThread(() -> {
-                            if (mMap != null) {
-                                if (!userId.equals(currentUserId)) {
-                                    if (!usersMarkers.containsKey(userId)) {
+            runOnUiThread(() -> {
+                if (mMap != null) {
+                    if (!userId.equals(currentUserId)) {
+                        if (!usersMarkers.containsKey(userId)) {
 
-                                        Marker marker = mMap.addMarker(new MarkerOptions()
+                            Marker marker = mMap.addMarker(new MarkerOptions()
 //                                                .title(userNames)
-                                                        .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(userNames)))
-                                                        .position(new LatLng(latitude, longitude))
-                                                        .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
-                                                        .visible(true)
-                                        );
+                                            .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(userNames)))
+                                            .position(new LatLng(latitude, longitude))
+                                            .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
+                                            .visible(true)
+                            );
 
-                                        marker.showInfoWindow();
+                            marker.showInfoWindow();
 
-                                        usersMarkers.put(userId, marker);
-                                    } else {
-                                        Marker m = usersMarkers.get(userId);
-                                        if (m != null) {
-                                            m.setPosition(new LatLng(latitude, longitude));
-                                            m.showInfoWindow();
-                                        }
-                                    }
-                                }
+                            usersMarkers.put(userId, marker);
+                        } else {
+                            Marker m = usersMarkers.get(userId);
+                            if (m != null) {
+                                m.setPosition(new LatLng(latitude, longitude));
+                                m.showInfoWindow();
                             }
+                        }
+                    }
+                }
 
-                        });
-                    });
-                }}
+            });
+        });
+        pusherEvents.put(PusherConnection.EVENT_FOUND_QR_CODE, (String channelName, String eventName, final String data) -> {
+            JsonObject info = new Gson().fromJson(data, JsonObject.class);
+
+            String userId = info.get("userId").getAsString();
+            String markerTitle = info.get("name").getAsString();
+            double latitude = info.get("latitude").getAsDouble();
+            double longitude = info.get("longitude").getAsDouble();
+
+            runOnUiThread(() -> {
+                if (mMap != null) {
+                    //TODO: display pin with QR location title (maybe the the pin must be with different style)
+                }
+            });
+        });
+
+
+        pusherConnection.bindChannelWithEvents(
+                PusherConnection.formatChannelName(PusherConnection.CHANNEL_USER_GAME, StoredData.getInt(this, StoredData.GAME_ID)),
+                pusherEvents
         );
 
         pusherConnection.connect();
@@ -184,7 +200,18 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
             if (resultCode == Activity.RESULT_OK) {
 
                 //TODO: send request to server /game/qr with params "qrCode": <String> and "gameId": <int>
-                // if success 200OK display popup and update isFound in DB
+                // if success 200OK
+                //      display popup and update isFound in DB
+                //      display pin with QR location title (maybe the the pin must be with different style)
+                //      the following data is returned, can be parsed with entity object
+                //      {
+                //          "id": 2,
+                //          "location_id": 1,
+                //          "name": "Патриаршия",
+                //          "points": 10,
+                //          "latitude": 43.083045,
+                //          "longitude": 25.652265
+                //      }
                 // if error
                 //      if error.networkResponse != null && error.networkResponse.data == "QR_ALREADY_FOUND" -> display alert dialog with message that the qr code is already found
                 //      else display alert dialog with message that the QR code is invalid
