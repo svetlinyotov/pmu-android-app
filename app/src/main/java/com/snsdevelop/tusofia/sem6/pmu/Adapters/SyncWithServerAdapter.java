@@ -15,10 +15,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.AllGamesEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.QRMarkerEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.RankEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Repositories.AllGamesRepository;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Repositories.LocationsRepository;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Repositories.QRMarkersRepository;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Repositories.RankingRepository;
+import com.snsdevelop.tusofia.sem6.pmu.Helpers.Entities.LocationWithMarkers;
 import com.snsdevelop.tusofia.sem6.pmu.R;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
@@ -37,6 +40,7 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
     private Context context;
 
     private LocationsRepository locationsRepository;
+    private QRMarkersRepository qrMarkersRepository;
     private RankingRepository rankingRepository;
     private AllGamesRepository allGamesRepository;
 
@@ -44,6 +48,7 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
         super(context, autoInitialize);
         rankingRepository = new RankingRepository((Application) context);
         locationsRepository = new LocationsRepository((Application) context);
+        qrMarkersRepository = new QRMarkersRepository((Application) context);
         allGamesRepository = new AllGamesRepository((Application) context);
         serverRequest = new Request(context);
         this.context = context;
@@ -53,6 +58,7 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
         super(context, autoInitialize, allowParallelSyncs);
         rankingRepository = new RankingRepository((Application) context);
         locationsRepository = new LocationsRepository((Application) context);
+        qrMarkersRepository = new QRMarkersRepository((Application) context);
         allGamesRepository = new AllGamesRepository((Application) context);
         serverRequest = new Request(context);
         this.context = context;
@@ -61,14 +67,38 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
 
+        if (StoredData.getString(context, StoredData.LOGGED_USER_ID) == null)
+            return;
+
         serverRequest.send(
                 new RequestBuilder(Method.GET, URL.GET_ALL_LOCATIONS)
                         .setResponseListener(response -> {
-                            List<LocationEntity> locationEntities = new Gson().fromJson(response, new TypeToken<ArrayList<LocationEntity>>() {
+                            List<LocationWithMarkers> locationWithMarkersList = new Gson().fromJson(response, new TypeToken<ArrayList<LocationEntity>>() {
                             }.getType());
 
-                            for (LocationEntity locationEntity : locationEntities) {
+
+                            for (LocationWithMarkers locationWithMarkers : locationWithMarkersList) {
+                                LocationEntity locationEntity = new LocationEntity();
+                                locationEntity.setId(locationWithMarkers.getId());
+                                locationEntity.setName(locationWithMarkers.getName());
+                                locationEntity.setLatitude(locationWithMarkers.getLatitude());
+                                locationEntity.setLongitude(locationWithMarkers.getLongitude());
                                 locationsRepository.insert(locationEntity);
+
+
+                                for (LocationWithMarkers.Marker marker : locationWithMarkers.getMarkers()) {
+                                    QRMarkerEntity qrMarkerEntity = new QRMarkerEntity();
+                                    qrMarkerEntity.setFound(false);
+                                    qrMarkerEntity.setLocationId(marker.getLocationId());
+                                    qrMarkerEntity.setId(marker.getId());
+                                    qrMarkerEntity.setLocation_lat(marker.getLatitude());
+                                    qrMarkerEntity.setLocation_lon(marker.getLongitude());
+                                    qrMarkerEntity.setQRcode(marker.getQrCode());
+                                    qrMarkerEntity.setTitle(marker.getName());
+                                    qrMarkerEntity.setDescription(marker.getDescription());
+                                    qrMarkerEntity.setPhoto(marker.getPhoto());
+                                    qrMarkersRepository.insert(qrMarkerEntity);
+                                }
                             }
 
                             Log.d("SyncWithServerAdapter", response.toString());

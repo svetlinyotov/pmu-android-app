@@ -1,18 +1,28 @@
 package com.snsdevelop.tusofia.sem6.pmu.Database.Entities;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "QRMarkers")
+import static androidx.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "QRMarkers",
+        foreignKeys =
+            @ForeignKey(entity = LocationEntity.class,
+                parentColumns = "id",
+                childColumns = "locationId",
+                onDelete = CASCADE))
 public class QRMarkerEntity {
 
     @PrimaryKey
     private int id;
-    private String locationId;
+    private int locationId;
     private String title;
     private String QRcode;
-    private String location_lat;
-    private String location_lon;
+    private String photo;
+    private String description;
+    private Double location_lat;
+    private Double location_lon;
     private boolean isFound;
 
     public int getId() {
@@ -23,11 +33,11 @@ public class QRMarkerEntity {
         this.id = id;
     }
 
-    public String getLocationId() {
+    public int getLocationId() {
         return locationId;
     }
 
-    public void setLocationId(String locationId) {
+    public void setLocationId(int locationId) {
         this.locationId = locationId;
     }
 
@@ -47,19 +57,35 @@ public class QRMarkerEntity {
         this.QRcode = QRcode;
     }
 
-    public String getLocation_lat() {
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Double getLocation_lat() {
         return location_lat;
     }
 
-    public void setLocation_lat(String location_lat) {
+    public void setLocation_lat(Double location_lat) {
         this.location_lat = location_lat;
     }
 
-    public String getLocation_lon() {
+    public Double getLocation_lon() {
         return location_lon;
     }
 
-    public void setLocation_lon(String location_lon) {
+    public void setLocation_lon(Double location_lon) {
         this.location_lon = location_lon;
     }
 

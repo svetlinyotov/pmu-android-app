@@ -37,7 +37,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
+import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.QRMarkerEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.LocationsViewModel;
+import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.QRMarkersViewModel;
+import com.snsdevelop.tusofia.sem6.pmu.Helpers.Entities.LocationWithMarkers;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
@@ -74,6 +77,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
 
     private RelativeLayout progressBar;
     private LocationsViewModel locationsViewModel;
+    private QRMarkersViewModel qrMarkersViewModel;
     private LinkedList<Marker> markers = new LinkedList<>();
     FusedLocationProviderClient fusedLocationClient;
 
@@ -118,6 +122,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
 
         serverRequest = new Request(this);
         locationsViewModel = ViewModelProviders.of(this).get(LocationsViewModel.class);
+        qrMarkersViewModel = ViewModelProviders.of(this).get(QRMarkersViewModel.class);
 
         if ((StoredData.getInt(this, StoredData.GAME_ID) != -1) && (StoredData.getString(this, StoredData.GAME_STATUS) != null) &&
                 !(StoredData.getString(this, StoredData.GAME_STATUS).equals(String.valueOf(GameStatus.FINISHED)))) {
@@ -240,14 +245,37 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
             serverRequest.send(
                     new RequestBuilder(Method.GET, URL.GET_ALL_LOCATIONS)
                             .setResponseListener(response -> {
-                                List<LocationEntity> locationEntities = new Gson().fromJson(response, new TypeToken<ArrayList<LocationEntity>>() {
+                                List<LocationWithMarkers> locationWithMarkersList = new Gson().fromJson(response, new TypeToken<ArrayList<LocationWithMarkers>>() {
                                 }.getType());
 
-                                displayMarkers(locationEntities);
+                                List<LocationEntity> locationEntities = new ArrayList<>(locationWithMarkersList.size());
 
-                                for (LocationEntity locationEntity : locationEntities) {
+                                for (LocationWithMarkers locationWithMarkers : locationWithMarkersList) {
+                                    LocationEntity locationEntity = new LocationEntity();
+                                    locationEntity.setId(locationWithMarkers.getId());
+                                    locationEntity.setName(locationWithMarkers.getName());
+                                    locationEntity.setLatitude(locationWithMarkers.getLatitude());
+                                    locationEntity.setLongitude(locationWithMarkers.getLongitude());
                                     locationsViewModel.insert(locationEntity);
+                                    locationEntities.add(locationEntity);
+
+
+                                    for (LocationWithMarkers.Marker marker : locationWithMarkers.getMarkers()) {
+                                        QRMarkerEntity qrMarkerEntity = new QRMarkerEntity();
+                                        qrMarkerEntity.setFound(false);
+                                        qrMarkerEntity.setLocationId(marker.getLocationId());
+                                        qrMarkerEntity.setId(marker.getId());
+                                        qrMarkerEntity.setLocation_lat(marker.getLatitude());
+                                        qrMarkerEntity.setLocation_lon(marker.getLongitude());
+                                        qrMarkerEntity.setQRcode(marker.getQrCode());
+                                        qrMarkerEntity.setTitle(marker.getName());
+                                        qrMarkerEntity.setDescription(marker.getDescription());
+                                        qrMarkerEntity.setPhoto(marker.getPhoto());
+                                        qrMarkersViewModel.insert(qrMarkerEntity);
+                                    }
                                 }
+
+                                displayMarkers(locationEntities);
                             })
                             .setErrorListener(error -> Toast.make(this, getString(R.string.error_sync_locations))
                             )
