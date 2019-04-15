@@ -223,7 +223,9 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
     protected void onStop() {
         super.onStop();
         serverRequest.stop();
-        fusedLocationClient.removeLocationUpdates(locationCallback);
+        if (fusedLocationClient != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
     }
 
     @Override

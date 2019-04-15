@@ -28,18 +28,19 @@ public class QRCameraActivity extends AppCompatActivity {
     BarcodeDetector barcode;
     CameraSource cameraSource;
     SurfaceHolder holder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_camera);
         PermissionCheck.cameraUse(this);
-        cameraView = (SurfaceView) findViewById(R.id.cameraView);
+        cameraView = findViewById(R.id.cameraView);
         cameraView.setZOrderMediaOverlay(true);
         holder = cameraView.getHolder();
         barcode = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.QR_CODE)
                 .build();
-        if(!barcode.isOperational()){
+        if (!barcode.isOperational()) {
             Toast.makeText(getApplicationContext(), "Sorry, Couldn't setup the detector", Toast.LENGTH_LONG).show();
             this.finish();
         }
@@ -47,17 +48,16 @@ public class QRCameraActivity extends AppCompatActivity {
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedFps(24)
                 .setAutoFocusEnabled(true)
-                .setRequestedPreviewSize(1920,1024)
+                .setRequestedPreviewSize(1920, 1024)
                 .build();
         cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                try{
-                    if(ContextCompat.checkSelfPermission(QRCameraActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
+                try {
+                    if (ContextCompat.checkSelfPermission(QRCameraActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(cameraView.getHolder());
                     }
-                }
-                catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -80,11 +80,10 @@ public class QRCameraActivity extends AppCompatActivity {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
-                final SparseArray<Barcode> barcodes =  detections.getDetectedItems();
-                if(barcodes.size() > 0){
-                    Log.d("KUUUUUUURR", barcodes.valueAt(0).displayValue);
+                final SparseArray<Barcode> barcodes = detections.getDetectedItems();
+                if (barcodes.size() > 0) {
                     Intent intent = new Intent();
-                    intent.putExtra("barcode", barcodes.valueAt(0));
+                    intent.putExtra("barcode", barcodes.valueAt(0).displayValue);
                     setResult(RESULT_OK, intent);
                     finish();
                 }
