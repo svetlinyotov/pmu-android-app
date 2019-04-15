@@ -14,7 +14,7 @@ import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.QRMarkerEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.RankEntity;
 
-@androidx.room.Database(entities = {LocationEntity.class, RankEntity.class, AllGamesEntity.class, QRMarkerEntity.class}, version = 6, exportSchema = false)
+@androidx.room.Database(entities = {LocationEntity.class, RankEntity.class, AllGamesEntity.class, QRMarkerEntity.class}, version = 7, exportSchema = false)
 
 public abstract class Database extends RoomDatabase {
     public abstract LocationsDao locationsDao();

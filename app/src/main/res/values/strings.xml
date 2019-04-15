@@ -63,4 +63,7 @@
     <string name="error_staring_game">Error starting game</string>
     <string name="title_qrmarkers">Markers</string>
     <string name="button_cancel">Cancel</string>
+    <string name="cant_read_info_twice">This code is already scanned!</string>
+    <string name="invalid_scan">This code is invalid!</string>
+    <string name="button_ok">OK</string>
 </resources>

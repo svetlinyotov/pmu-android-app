@@ -19,4 +19,5 @@ public interface URL {
     String GAME_LOCATION = PREFIX + "/game/location";
     String GAME_START_TEAM_PLAY = PREFIX + "/game/start/team/start";
     String GAME_START_TEAM_LIST_PLAYERS = PREFIX + "/game/start/team/list/players";
+    String GAME_QR = PREFIX + "/game/qr";
 }

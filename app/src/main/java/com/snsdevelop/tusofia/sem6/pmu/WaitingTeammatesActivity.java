@@ -22,6 +22,7 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.AlertDialog;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
@@ -112,32 +113,41 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
                                 .build(this)));
 
         buttonCancelTeamPlay.setOnClickListener((v) ->
-                //TODO send the request after AlertDialog confirmation
-                serverRequest.send(
-                        new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_UN_JOIN_TEAM)
-                                .setResponseListener(response -> {
-                                    StoredData.saveString(this, StoredData.GAME_MODE, null);
-                                    StoredData.saveString(this, StoredData.GAME_STATUS, null);
-                                    StoredData.saveInt(this, StoredData.GAME_ID, -1);
-                                    StoredData.saveString(this, StoredData.GAME_NAME, null);
-                                    StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, false);
-                                    startActivity(new Intent(this, LocationsActivity.class));
-                                })
-                                .setErrorListener(error -> Toast.make(this, getString(R.string.error_staring_game)))
-                                .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
-                                .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
-                                .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
-                                .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
-                                .build(this)));
+                AlertDialog.styled(this, new AlertDialog(this).getBuilder()
+                        .setTitle(getString(R.string.are_you_sure))
+                        .setPositiveButton(getString(R.string.answer_yes), (dialogInterface, which) -> {
+
+                            serverRequest.send(
+                                    new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_UN_JOIN_TEAM)
+                                            .setResponseListener(response -> {
+                                                StoredData.saveString(this, StoredData.GAME_MODE, null);
+                                                StoredData.saveString(this, StoredData.GAME_STATUS, null);
+                                                StoredData.saveInt(this, StoredData.GAME_ID, -1);
+                                                StoredData.saveString(this, StoredData.GAME_NAME, null);
+                                                StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, false);
+                                                startActivity(new Intent(this, LocationsActivity.class));
+                                            })
+                                            .setErrorListener(error -> Toast.make(this, getString(R.string.error_staring_game)))
+                                            .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
+                                            .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                                            .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                                            .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+                                            .build(this));
+                            startActivity(new Intent(this, LocationsActivity.class));
+                        })
+                        .setNegativeButton(getString(R.string.answer_no), (dialogInterface, which) -> dialogInterface.cancel())
+                        .create()));
 
         if (StoredData.getBoolean(this, StoredData.GAME_IS_TEAM_HOST)) {
             startGame.setVisibility(View.VISIBLE);
             waitingHost.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
+            buttonCancelTeamPlay.setVisibility(View.GONE);
         } else {
             startGame.setVisibility(View.GONE);
             waitingHost.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.VISIBLE);
+            buttonCancelTeamPlay.setVisibility(View.VISIBLE);
         }
     }
 

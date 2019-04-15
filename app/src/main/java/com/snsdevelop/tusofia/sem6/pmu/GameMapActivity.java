@@ -36,8 +36,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.ui.IconGenerator;
 import com.pusher.client.channel.SubscriptionEventListener;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.QRMarkerEntity;
@@ -52,6 +55,7 @@ import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -216,6 +220,37 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                 //      if error.networkResponse != null && error.networkResponse.data == "QR_ALREADY_FOUND" -> display alert dialog with message that the qr code is already found
                 //      else display alert dialog with message that the QR code is invalid
                 String result = data.getStringExtra("barcode");
+                serverRequest.send(
+                        new RequestBuilder(Method.POST, URL.GAME_QR)
+                                .setResponseListener(response -> {
+                                    List<QRMarkerEntity> qrMarkerEntity = new GsonBuilder()
+                                            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                            .create()
+                                            .fromJson(response, new TypeToken<ArrayList<QRMarkerEntity>>() {
+                                            }.getType());
+                                })
+                                .setErrorListener(error -> {
+                                    if (error.networkResponse != null && !error.networkResponse.data.equals("QR_ALREADY_FOUND")){
+                                        AlertDialog.styled(this, new AlertDialog(this).getBuilder()
+                                                .setTitle(getString(R.string.cant_read_info_twice))
+                                                .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> {
+                                                    dialogInterface.cancel();
+                                                })
+                                                .create());
+                                    }
+                                    else{
+                                        AlertDialog.styled(this, new AlertDialog(this).getBuilder()
+                                                .setTitle(getString(R.string.invalid_scan))
+                                                .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> {
+                                                    dialogInterface.cancel();
+                                                })
+                                                .create());
+                                    }
+                                })
+                                .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
+                                .addParam("qrCode", String.valueOf(StoredData.getString(this, result)))
+                                .build(this));
+
 
                 List<QRMarkerEntity> QRMarkers = QRMarkersViewModel.getMarker(result);
 
