@@ -20,6 +20,11 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -34,7 +39,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.QRMarkerEntity;
@@ -46,19 +52,12 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
-import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.PlayMode;
-import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
 
 import static com.snsdevelop.tusofia.sem6.pmu.Utils.PermissionCheck.LOCATION_PERMISSION_REQUEST_CODE;
 
@@ -245,8 +244,11 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
             serverRequest.send(
                     new RequestBuilder(Method.GET, URL.GET_ALL_LOCATIONS)
                             .setResponseListener(response -> {
-                                List<LocationWithMarkers> locationWithMarkersList = new Gson().fromJson(response, new TypeToken<ArrayList<LocationWithMarkers>>() {
-                                }.getType());
+                                List<LocationWithMarkers> locationWithMarkersList = new GsonBuilder()
+                                        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                        .create()
+                                        .fromJson(response, new TypeToken<ArrayList<LocationWithMarkers>>() {
+                                        }.getType());
 
                                 List<LocationEntity> locationEntities = new ArrayList<>(locationWithMarkersList.size());
 

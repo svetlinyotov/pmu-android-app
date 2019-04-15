@@ -189,40 +189,37 @@ public class PlayModeActivity extends AppCompatActivity {
 
         builder.setTitle("Choose team")
                 .setView(viewInflated)
-                .setAdapter(dataAdapter, (dialogInterface, which) -> {
+                .setAdapter(dataAdapter, (dialogInterface, which) ->
+                        serverRequest.send(
+                                new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_JOIN_TEAM)
+                                        .setResponseListener(response -> {
+                                            System.out.println(response);
+                                            try {
+                                                JsonObject gameInfo = new Gson().fromJson(response, JsonObject.class);
 
-                    serverRequest.send(
-                            new RequestBuilder(Method.POST, URL.START_TEAM_PLAYER_GAME_JOIN_TEAM)
-                                    .setResponseListener(response -> {
-                                        System.out.println(response);
-                                        try {
-                                            JsonObject gameInfo = new Gson().fromJson(response, JsonObject.class);
+                                                StoredData.saveString(this, StoredData.GAME_MODE, String.valueOf(PlayMode.TEAM));
+                                                StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.PENDING));
+                                                StoredData.saveInt(this, StoredData.GAME_ID, gameInfo.get("gameId").getAsInt());
+                                                StoredData.saveString(this, StoredData.GAME_NAME, gameInfo.get("gameName").getAsString());
+                                                StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, false);
 
-                                            StoredData.saveString(this, StoredData.GAME_MODE, String.valueOf(PlayMode.TEAM));
-                                            StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.PENDING));
-                                            StoredData.saveInt(this, StoredData.GAME_ID, gameInfo.get("gameId").getAsInt());
-                                            StoredData.saveString(this, StoredData.GAME_NAME, gameInfo.get("gameName").getAsString());
-                                            StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, false);
-
-                                            startActivity(new Intent(this, WaitingTeammatesActivity.class));
-                                        } catch (IllegalStateException e) {
-                                            e.printStackTrace();
-                                            Toast.make(this, getString(R.string.error_parsin_data));
-                                        }
-                                    })
-                                    .setErrorListener(error -> {
-                                        System.out.println(new String(error.networkResponse.data));
-                                        Toast.make(this, getString(R.string.error_creating_team));
-                                        dialogInterface.cancel();
-                                    })
-                                    .addParam("locationId", String.valueOf(locationId))
-                                    .addParam("gameId", String.valueOf(teams.get(which).getId()))
-                                    .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
-                                    .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
-                                    .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
-                                    .build(this));
-
-                });
+                                                startActivity(new Intent(this, WaitingTeammatesActivity.class));
+                                            } catch (IllegalStateException e) {
+                                                e.printStackTrace();
+                                                Toast.make(this, getString(R.string.error_parsin_data));
+                                            }
+                                        })
+                                        .setErrorListener(error -> {
+                                            System.out.println(new String(error.networkResponse.data));
+                                            Toast.make(this, getString(R.string.error_creating_team));
+                                            dialogInterface.cancel();
+                                        })
+                                        .addParam("locationId", String.valueOf(locationId))
+                                        .addParam("gameId", String.valueOf(teams.get(which).getId()))
+                                        .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                                        .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                                        .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+                                        .build(this)));
 
         android.app.AlertDialog instance = builder.create();
 

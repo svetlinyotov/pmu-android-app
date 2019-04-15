@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.AllGamesEntity;
@@ -73,9 +72,11 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
         serverRequest.send(
                 new RequestBuilder(Method.GET, URL.GET_ALL_LOCATIONS)
                         .setResponseListener(response -> {
-                            List<LocationWithMarkers> locationWithMarkersList = new Gson().fromJson(response, new TypeToken<ArrayList<LocationEntity>>() {
-                            }.getType());
-
+                            List<LocationWithMarkers> locationWithMarkersList = new GsonBuilder()
+                                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                    .create()
+                                    .fromJson(response, new TypeToken<ArrayList<LocationWithMarkers>>() {
+                                    }.getType());
 
                             for (LocationWithMarkers locationWithMarkers : locationWithMarkersList) {
                                 LocationEntity locationEntity = new LocationEntity();
@@ -101,7 +102,7 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
                                 }
                             }
 
-                            Log.d("SyncWithServerAdapter", response.toString());
+                            Log.d("SyncWithServerAdapter", response);
                         })
                         .setErrorListener(error -> Toast.make(context, context.getString(R.string.error_sync_locations))
                         )
@@ -121,9 +122,7 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
                                 rankingRepository.insert(rankEntity);
                             }
                         })
-                        .setErrorListener(error -> {
-                            Toast.make(context, context.getString(R.string.error_sync_ranking));
-                        })
+                        .setErrorListener(error -> Toast.make(context, context.getString(R.string.error_sync_ranking)))
                         .build(context)
         );
 
@@ -142,9 +141,7 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
                                 allGamesRepository.insert(allGamesEntity);
                             }
                         })
-                        .setErrorListener(error -> {
-                            Toast.make(context, context.getString(R.string.error_sync_all_games));
-                        })
+                        .setErrorListener(error -> Toast.make(context, context.getString(R.string.error_sync_all_games)))
 
                         .addHeader("AuthOrigin", StoredData.getString(context, StoredData.LOGGED_USER_ORIGIN))
                         .addHeader("AccessToken", StoredData.getString(context, StoredData.LOGGED_USER_TOKEN))

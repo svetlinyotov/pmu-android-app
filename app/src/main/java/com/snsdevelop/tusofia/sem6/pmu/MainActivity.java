@@ -4,10 +4,13 @@ import android.accounts.Account;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -36,10 +39,12 @@ import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.AlertDialog;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.PermissionCheck;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.SyncServiceHelper;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 import com.snsdevelop.tusofia.sem6.pmu.services.LocationBackgroundService;
 
+import static com.snsdevelop.tusofia.sem6.pmu.Utils.PermissionCheck.LOCATION_PERMISSION_REQUEST_CODE;
 import static com.snsdevelop.tusofia.sem6.pmu.Utils.SyncServiceHelper.AUTHORITY;
 
 public class MainActivity extends Activity {
@@ -60,7 +65,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startService(new Intent(this, LocationBackgroundService.class));
+        if (PermissionCheck.fetchUserFineLocation(this)) {
+            startService(new Intent(this, LocationBackgroundService.class));
+        }
 
         Account account = SyncServiceHelper.CreateSyncAccount(this);
         ContentResolver.setSyncAutomatically(account, AUTHORITY, true);
@@ -155,6 +162,16 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
                 new AlertDialog(MainActivity.this).getBuilder().setTitle(getResources().getString(R.string.modal_login_auth_error)).setMessage(getResources().getString(R.string.modal_login_error_google)).show();
+            }
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startService(new Intent(this, LocationBackgroundService.class));
             }
         }
     }
