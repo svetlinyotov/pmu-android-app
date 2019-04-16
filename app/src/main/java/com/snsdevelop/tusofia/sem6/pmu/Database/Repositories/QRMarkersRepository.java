@@ -29,7 +29,7 @@ public class QRMarkersRepository {
 
     }
 
-    public List<QRMarkerEntity> getMarker(String result){
+    public List<QRMarkerEntity> getMarker(String result) {
         try {
             return new getAsyncTask(qrMarkersDao).execute().get();
         } catch (ExecutionException | InterruptedException e) {
@@ -39,6 +39,10 @@ public class QRMarkersRepository {
 
     public void insert(QRMarkerEntity qrMarkerEntity) {
         new insertAsyncTask(qrMarkersDao).execute(qrMarkerEntity);
+    }
+
+    public void updateIsFound(boolean isFound, int markerId) {
+        new updateIsFoundAsyncTask(qrMarkersDao, isFound).execute(markerId);
     }
 
     public void deleteAll() {
@@ -70,6 +74,24 @@ public class QRMarkersRepository {
         @Override
         protected Void doInBackground(final QRMarkerEntity... params) {
             qrMarkersDao.insert(params[0]);
+            return null;
+        }
+    }
+
+
+    private static class updateIsFoundAsyncTask extends AsyncTask<Integer, Void, Void> {
+
+        private QRMarkersDao qrMarkersDao;
+        private boolean isFound;
+
+        updateIsFoundAsyncTask(QRMarkersDao dao, boolean isFound) {
+            qrMarkersDao = dao;
+            this.isFound = isFound;
+        }
+
+        @Override
+        protected Void doInBackground(final Integer... params) {
+            qrMarkersDao.updateIsFound(isFound, params[0]);
             return null;
         }
     }

@@ -8,7 +8,7 @@ import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "QRMarkers",
         foreignKeys =
-            @ForeignKey(entity = LocationEntity.class,
+        @ForeignKey(entity = LocationEntity.class,
                 parentColumns = "id",
                 childColumns = "locationId",
                 onDelete = CASCADE))
@@ -17,12 +17,13 @@ public class QRMarkerEntity {
     @PrimaryKey
     private int id;
     private int locationId;
-    private String title;
+    private String name;
     private String QRcode;
     private String photo;
     private String description;
-    private Double location_lat;
-    private Double location_lon;
+    private Double latitude;
+    private Double longitude;
+    private Double points;
     private boolean isFound;
 
     public int getId() {
@@ -41,12 +42,12 @@ public class QRMarkerEntity {
         this.locationId = locationId;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getQRcode() {
@@ -73,20 +74,28 @@ public class QRMarkerEntity {
         this.description = description;
     }
 
-    public Double getLocation_lat() {
-        return location_lat;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLocation_lat(Double location_lat) {
-        this.location_lat = location_lat;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
-    public Double getLocation_lon() {
-        return location_lon;
+    public Double getLongitude() {
+        return longitude;
     }
 
-    public void setLocation_lon(Double location_lon) {
-        this.location_lon = location_lon;
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Double getPoints() {
+        return points;
+    }
+
+    public void setPoints(Double points) {
+        this.points = points;
     }
 
     public boolean isFound() {

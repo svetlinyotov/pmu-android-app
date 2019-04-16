@@ -15,6 +15,6 @@
         android:entryValues="@array/settings_languages_keys"
         android:icon="@drawable/ic_language_999_24dp"
         android:key="settingsCurrentLanguage"
-        android:title="@string/settings_language" />
+        android:name="@string/settings_language" />
 
 </PreferenceScreen>

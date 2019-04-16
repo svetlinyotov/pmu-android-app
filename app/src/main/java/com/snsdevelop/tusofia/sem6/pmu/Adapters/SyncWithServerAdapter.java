@@ -92,10 +92,10 @@ public class SyncWithServerAdapter extends AbstractThreadedSyncAdapter {
                                     qrMarkerEntity.setFound(false);
                                     qrMarkerEntity.setLocationId(marker.getLocationId());
                                     qrMarkerEntity.setId(marker.getId());
-                                    qrMarkerEntity.setLocation_lat(marker.getLatitude());
-                                    qrMarkerEntity.setLocation_lon(marker.getLongitude());
+                                    qrMarkerEntity.setLatitude(marker.getLatitude());
+                                    qrMarkerEntity.setLongitude(marker.getLongitude());
                                     qrMarkerEntity.setQRcode(marker.getQrCode());
-                                    qrMarkerEntity.setTitle(marker.getName());
+                                    qrMarkerEntity.setName(marker.getName());
                                     qrMarkerEntity.setDescription(marker.getDescription());
                                     qrMarkerEntity.setPhoto(marker.getPhoto());
                                     qrMarkersRepository.insert(qrMarkerEntity);

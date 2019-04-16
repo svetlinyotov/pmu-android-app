@@ -179,10 +179,12 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
             String markerTitle = info.get("name").getAsString();
             double latitude = info.get("latitude").getAsDouble();
             double longitude = info.get("longitude").getAsDouble();
+            //TODO: send markerId as well on the server
 
             runOnUiThread(() -> {
                 if (mMap != null) {
                     //TODO: display pin with QR location title (maybe the the pin must be with different style)
+                    //TODO: display push notification about the found marker
                 }
             });
         });
@@ -202,88 +204,43 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK) {
-
-                //TODO: send request to server /game/qr with params "qrCode": <String> and "gameId": <int>
-                // if success 200OK
-                //      display popup and update isFound in DB
-                //      display pin with QR location title (maybe the the pin must be with different style)
-                //      the following data is returned, can be parsed with entity object
-                //      {
-                //          "id": 2,
-                //          "location_id": 1,
-                //          "name": "Патриаршия",
-                //          "points": 10,
-                //          "latitude": 43.083045,
-                //          "longitude": 25.652265
-                //      }
-                // if error
-                //      if error.networkResponse != null && error.networkResponse.data == "QR_ALREADY_FOUND" -> display alert dialog with message that the qr code is already found
-                //      else display alert dialog with message that the QR code is invalid
                 String result = data.getStringExtra("barcode");
                 serverRequest.send(
                         new RequestBuilder(Method.POST, URL.GAME_QR)
                                 .setResponseListener(response -> {
-                                    List<QRMarkerEntity> qrMarkerEntity = new GsonBuilder()
+                                    QRMarkerEntity qrMarkerEntity = new GsonBuilder()
                                             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                                             .create()
-                                            .fromJson(response, new TypeToken<ArrayList<QRMarkerEntity>>() {
+                                            .fromJson(response, new TypeToken<QRMarkerEntity>() {
                                             }.getType());
+
+                                    QRMarkersViewModel.updateIsFound(true, qrMarkerEntity.getId());
+
+                                    //TODO display marker on the map
+
+                                    displayMarkerInfoPopup(qrMarkerEntity.getId());
                                 })
                                 .setErrorListener(error -> {
-                                    if (error.networkResponse != null && !error.networkResponse.data.equals("QR_ALREADY_FOUND")){
+                                    if (error.networkResponse != null &&
+                                            error.networkResponse.data != null &&
+                                            !new String(error.networkResponse.data).equals("QR_ALREADY_FOUND")) {
                                         AlertDialog.styled(this, new AlertDialog(this).getBuilder()
                                                 .setTitle(getString(R.string.cant_read_info_twice))
-                                                .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> {
-                                                    dialogInterface.cancel();
-                                                })
+                                                .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> dialogInterface.cancel())
                                                 .create());
-                                    }
-                                    else{
+                                    } else {
                                         AlertDialog.styled(this, new AlertDialog(this).getBuilder()
                                                 .setTitle(getString(R.string.invalid_scan))
-                                                .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> {
-                                                    dialogInterface.cancel();
-                                                })
+                                                .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> dialogInterface.cancel())
                                                 .create());
                                     }
                                 })
                                 .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
-                                .addParam("qrCode", String.valueOf(StoredData.getString(this, result)))
+                                .addParam("qrCode", result)
+                                .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                                .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                                .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
                                 .build(this));
-
-
-                List<QRMarkerEntity> QRMarkers = QRMarkersViewModel.getMarker(result);
-
-                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
-                View popup = inflater.inflate(R.layout.qr_marker_popup, null);
-
-                mPopupWindow = new PopupWindow(
-                        popup,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                );
-                mPopupWindow.setElevation(5.0f);
-                mPopupWindow.setAnimationStyle(R.style.WindowPopupAnimation);
-                ImageButton closeButton = popup.findViewById(R.id.closePopUp);
-                WebView webView = popup.findViewById(R.id.webViewQRMarkerPopup);
-
-                closeButton.setOnClickListener(view -> mPopupWindow.dismiss());
-
-                webView.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public void onPageFinished(WebView view, String url) {
-                        mPopupWindow.showAtLocation(mRelativeLayout, Gravity.CENTER, 0, 0);
-                    }
-                });
-
-                Map<String, String> headers = new HashMap<>();
-
-                headers.put("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN));
-                headers.put("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN));
-                headers.put("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID));
-
-                //TODO: here replace 2 with the marker ID
-                webView.loadUrl("https://snsdevelop.com/time-travellers/api/v1/app/game/qr/" + 2, headers);
             }
         }
     }
@@ -303,12 +260,44 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         enableMyLocationIfPermitted();
-
     }
 
     @Override
     public void onBackPressed() {
         Toast.make(this, getString(R.string.error_going_back));
+    }
+
+    private void displayMarkerInfoPopup(int markerId) {
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popup = inflater.inflate(R.layout.qr_marker_popup, null);
+
+        mPopupWindow = new PopupWindow(
+                popup,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+        mPopupWindow.setElevation(5.0f);
+        mPopupWindow.setAnimationStyle(R.style.WindowPopupAnimation);
+        ImageButton closeButton = popup.findViewById(R.id.closePopUp);
+        WebView webView = popup.findViewById(R.id.webViewQRMarkerPopup);
+
+        closeButton.setOnClickListener(view -> mPopupWindow.dismiss());
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                mPopupWindow.showAtLocation(mRelativeLayout, Gravity.CENTER, 0, 0);
+            }
+        });
+
+        Map<String, String> headers = new HashMap<>();
+
+        headers.put("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN));
+        headers.put("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN));
+        headers.put("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID));
+
+        webView.loadUrl("https://snsdevelop.com/time-travellers/api/v1/app/game/qr/" + markerId, headers);
     }
 
     private void enableMyLocationIfPermitted() {

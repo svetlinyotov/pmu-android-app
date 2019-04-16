@@ -21,13 +21,19 @@ public class QRMarkersViewModel extends AndroidViewModel {
         return qrMarkersRepository.getAll();
     }
 
-    public List<QRMarkerEntity> getMarker(String result){return qrMarkersRepository.getMarker(result);}
+    public List<QRMarkerEntity> getMarker(String result) {
+        return qrMarkersRepository.getMarker(result);
+    }
 
     public void insert(QRMarkerEntity word) {
         qrMarkersRepository.insert(word);
     }
 
-    public void deleteAll(){
+    public void updateIsFound(boolean isFound, int markerId) {
+        qrMarkersRepository.updateIsFound(isFound, markerId);
+    }
+
+    public void deleteAll() {
         qrMarkersRepository.deleteAll();
     }
 }
