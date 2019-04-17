@@ -29,6 +29,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -99,7 +101,6 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         mRelativeLayout = findViewById(R.id.gameMap);
         mContext = getApplicationContext();
 
-        String currentUserId = StoredData.getString(this, StoredData.LOGGED_USER_ID);
         ImageButton buttonGiveUp = findViewById(R.id.buttonGiveUp);
         ImageButton buttonCamera = findViewById(R.id.buttonCamera);
         TextView foundMarkers = findViewById(R.id.tvMarkersFound);
@@ -130,6 +131,12 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                         .create()));
 
         usersMarkers = new HashMap<>();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        String currentUserId = StoredData.getString(this, StoredData.LOGGED_USER_ID);
 
         pusherConnection = new PusherConnection(this);
 
@@ -183,7 +190,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
             runOnUiThread(() -> {
                 if (mMap != null) {
-                    //TODO: display pin with QR location title (maybe the the pin must be with different style)
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(markerTitle));
                     //TODO: display push notification about the found marker
                 }
             });
@@ -216,14 +223,15 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
                                     QRMarkersViewModel.updateIsFound(true, qrMarkerEntity.getId());
 
-                                    //TODO display marker on the map
+                                    String description = qrMarkerEntity.getDescription();
+                                    mMap.addMarker(new MarkerOptions().position(new LatLng(qrMarkerEntity.getLatitude(), qrMarkerEntity.getLongitude())).title(qrMarkerEntity.getName()).snippet(description.substring(0, Math.min(description.length(), 50)) + "..."));
 
                                     displayMarkerInfoPopup(qrMarkerEntity.getId());
                                 })
                                 .setErrorListener(error -> {
                                     if (error.networkResponse != null &&
                                             error.networkResponse.data != null &&
-                                            !new String(error.networkResponse.data).equals("QR_ALREADY_FOUND")) {
+                                            new String(error.networkResponse.data).contains("QR_ALREADY_FOUND")) {
                                         AlertDialog.styled(this, new AlertDialog(this).getBuilder()
                                                 .setTitle(getString(R.string.cant_read_info_twice))
                                                 .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> dialogInterface.cancel())
@@ -312,6 +320,9 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                     locationCallback,
                     null
             );
+
+            fusedLocationClient.getLastLocation().addOnSuccessListener(location ->
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude()))));
 
             mMap.setMyLocationEnabled(true);
         }

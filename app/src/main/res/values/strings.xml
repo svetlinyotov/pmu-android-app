@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TimeTravel</string>
+    <string name="app_name">TimeTravellers</string>
 
     <string name="google_client_id">282356621189-m9d115k639rr7g8siaapldb3l72ja88l.apps.googleusercontent.com</string>
     <string name="google_web_client_id">282356621189-sd2i4jman7d8hpqvn2rqjq38rfsnukee.apps.googleusercontent.com</string>
