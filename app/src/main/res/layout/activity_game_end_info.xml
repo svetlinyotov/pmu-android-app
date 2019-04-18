@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/history_background"
+    tools:context=".GameEndInfoActivity">
+
+    <ImageButton
+        android:id="@+id/buttonTest"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="70dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button_test" />
+
+    <TextView
+        android:id="@+id/textStartTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:text="@string/button_start_test"
+        android:textColor="#340000"
+        android:textSize="32sp" />
+
+    <RelativeLayout
+        android:id="@+id/layoutTitleEndGame"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/old_color"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textViewTitleEndGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/ivTitleStar"
+            android:fontFamily="@font/history_lowercase"
+            android:gravity="center_vertical|end"
+            android:text="@string/title_end_game"
+            android:textAlignment="viewEnd"
+            android:textSize="40sp" />
+
+        <ImageView
+            android:id="@+id/ivTitleStar"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:textAlignment="center"
+            android:visibility="visible"
+            app:srcCompat="@android:drawable/btn_star_big_on" />
+    </RelativeLayout>
+
+
+</RelativeLayout>

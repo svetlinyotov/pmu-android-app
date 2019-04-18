@@ -47,6 +47,7 @@ import com.google.maps.android.ui.IconGenerator;
 import com.pusher.client.channel.SubscriptionEventListener;
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.QRMarkerEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.QRMarkersViewModel;
+import com.snsdevelop.tusofia.sem6.pmu.Helpers.Entities.GameStatusEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Pusher.PusherConnection;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
@@ -131,6 +132,28 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                         .create()));
 
         usersMarkers = new HashMap<>();
+
+        serverRequest.send(
+                new RequestBuilder(Method.GET, URL.GAME_STATUS)
+                        .setResponseListener(response -> {
+                            List<GameStatusEntity> gameStatusEntities = new Gson()
+                                    .fromJson(response, new TypeToken<ArrayList<GameStatusEntity>>() {
+                                    }.getType());
+
+
+                        })
+                        .setErrorListener(error -> {
+
+                        })
+
+                        .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                        .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                        .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+
+                        .build(this)
+
+
+        );
     }
 
     @Override

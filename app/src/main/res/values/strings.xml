@@ -66,4 +66,8 @@
     <string name="cant_read_info_twice">This code is already scanned!</string>
     <string name="invalid_scan">This code is invalid!</string>
     <string name="button_ok">OK</string>
+    <string name="title_end_game">Game info</string>
+    <string name="button_start_test">Start test</string>
+    <string name="error_taking_marker_list">Error taking found markers list</string>
+
 </resources>
