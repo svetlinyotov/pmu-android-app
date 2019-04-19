@@ -136,24 +136,25 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         serverRequest.send(
                 new RequestBuilder(Method.GET, URL.GAME_STATUS)
                         .setResponseListener(response -> {
-                            List<GameStatusEntity> gameStatusEntities = new Gson()
-                                    .fromJson(response, new TypeToken<ArrayList<GameStatusEntity>>() {
+                            GameStatusEntity gameStatusEntities = new Gson()
+                                    .fromJson(response, new TypeToken<GameStatusEntity>() {
                                     }.getType());
-
-
+                            StoredData.saveInt(this, StoredData.FOUND_MARKERS, gameStatusEntities.getFoundMarkers());
+                            StoredData.saveInt(this, StoredData.TOTAL_MARKERS, gameStatusEntities.getTotalMarkers());
+                            StoredData.saveInt(this, StoredData.TOTAL_SCORE, gameStatusEntities.getTotalScore());
                         })
                         .setErrorListener(error -> {
 
                         })
-
                         .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
                         .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
                         .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
-
                         .build(this)
-
-
         );
+
+        if(StoredData.getInt(this,StoredData.FOUND_MARKERS) == StoredData.getInt(this,StoredData.TOTAL_MARKERS)){
+            startActivity(new Intent(this, GameEndInfoActivity.class));
+        }
     }
 
     @Override
@@ -245,6 +246,8 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                                             }.getType());
 
                                     QRMarkersViewModel.updateIsFound(true, qrMarkerEntity.getId());
+                                    StoredData.saveInt(this, StoredData.TOTAL_SCORE, Integer.valueOf(StoredData.TOTAL_SCORE)+10);
+                                    StoredData.saveInt(this, StoredData.FOUND_MARKERS, Integer.valueOf(StoredData.FOUND_MARKERS)+1);
 
                                     String description = qrMarkerEntity.getDescription();
                                     mMap.addMarker(new MarkerOptions().position(new LatLng(qrMarkerEntity.getLatitude(), qrMarkerEntity.getLongitude())).title(qrMarkerEntity.getName()).snippet(description.substring(0, Math.min(description.length(), 50)) + "..."));

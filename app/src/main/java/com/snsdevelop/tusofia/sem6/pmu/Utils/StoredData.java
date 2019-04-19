@@ -19,6 +19,7 @@ public class StoredData {
     public static final String GAME_IS_TEAM_HOST = "game_is_team_host";
     public static final String FOUND_MARKERS = "found_markers";
     public static final String TOTAL_MARKERS = "total_markers";
+    public static final String TOTAL_SCORE = "total_score";
 
     public static final String SETTINGS_IS_BG_MUSIC_PLAYING = "settingsIsBGMusicMuted";
     public static final String SETTINGS_CURRENT_LANGUAGE = "settingsCurrentLanguage";
