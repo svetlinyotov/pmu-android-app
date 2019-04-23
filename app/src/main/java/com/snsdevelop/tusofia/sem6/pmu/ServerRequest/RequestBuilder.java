@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
+
 import com.snsdevelop.tusofia.sem6.pmu.Helpers.Auth;
 
 public class RequestBuilder {
@@ -25,6 +26,11 @@ public class RequestBuilder {
         this.url = url;
         this.TAG = "SelFitRequestTAG_" + method + "_" + url;
     }
+
+    public RequestBuilder(int method, String url, int id) {
+        this(method, url.replace("{id}", String.valueOf(id)));
+    }
+
 
     public RequestBuilder setResponseListener(Response.Listener<String> responseListener) {
         this.responseListener = responseListener;

@@ -7,6 +7,7 @@ public interface URL {
 
     String PREFIX = PROTOCOL + "://" + HOST + ":" + PORT + "/time-travellers/api/v1/app";
 
+    String MARKER_IMAGE_PREFIX = "https://snsdevelop.com/time-travellers/images/markers/";
     String OAUTH_LOGIN = PREFIX + "/login";
     String GET_ALL_LOCATIONS = PREFIX + "/locations";
     String GET_GLOBAL_RANKING = PREFIX + "/ranking";

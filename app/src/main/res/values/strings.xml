@@ -61,7 +61,7 @@
     <string name="error_creating_team">Error creating team. Try again</string>
     <string name="error_failed_send_location_to_server">Failed to send location to server</string>
     <string name="error_staring_game">Error starting game</string>
-    <string name="title_qrmarkers">Markers</string>
+    <string name="title_qrmarkers">Markers (%d from %d)</string>
     <string name="button_cancel">Cancel</string>
     <string name="cant_read_info_twice">This code is already scanned!</string>
     <string name="invalid_scan">This code is invalid!</string>
@@ -69,5 +69,7 @@
     <string name="title_end_game">Game info</string>
     <string name="button_start_test">Start test</string>
     <string name="error_taking_marker_list">Error taking found markers list</string>
+    <string name="error_cannot_update_latest_marker_info">Cannot update latest marker info</string>
+    <string name="error_allow_camera_permission">You must allow camera to scan QR code</string>
 
 </resources>

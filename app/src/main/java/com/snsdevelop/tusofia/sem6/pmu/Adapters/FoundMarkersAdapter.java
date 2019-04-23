@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.QRMarkerEntity;
 import com.snsdevelop.tusofia.sem6.pmu.R;
+import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -45,7 +46,8 @@ public class FoundMarkersAdapter extends ArrayAdapter<QRMarkerEntity> {
         }
         QRMarkerEntity qrMarkerEntity = getItem(position);
         if (qrMarkerEntity != null) {
-            Picasso.with(mContext).load(qrMarkerEntity.getPhoto()).into(holder.pic);
+            Picasso.with(mContext).load(URL.MARKER_IMAGE_PREFIX + qrMarkerEntity.getPhoto()).resize(150, 150)
+                    .centerCrop().into(holder.pic);
             holder.name.setText(qrMarkerEntity.getName());
         }
 

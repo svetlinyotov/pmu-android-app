@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -58,9 +57,7 @@ import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.snsdevelop.tusofia.sem6.pmu.Utils.PermissionCheck.LOCATION_PERMISSION_REQUEST_CODE;
@@ -77,6 +74,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
     private RelativeLayout mRelativeLayout;
     private PopupWindow mPopupWindow;
     private Context mContext;
+    private TextView foundMarkers;
     public static final int requestCode = 1;
 
     LocationCallback locationCallback = new LocationCallback() {
@@ -104,7 +102,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         ImageButton buttonGiveUp = findViewById(R.id.buttonGiveUp);
         ImageButton buttonCamera = findViewById(R.id.buttonCamera);
-        TextView foundMarkers = findViewById(R.id.tvMarkersFound);
+        foundMarkers = findViewById(R.id.tvMarkersFound);
 
         foundMarkers.setOnClickListener((v) -> {
             startActivity(new Intent(this, FoundQRMarkersActivity.class));
@@ -134,25 +132,32 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         usersMarkers = new HashMap<>();
 
         serverRequest.send(
-                new RequestBuilder(Method.GET, URL.GAME_STATUS)
+                new RequestBuilder(Method.GET, URL.GAME_STATUS, StoredData.getInt(this, StoredData.GAME_ID))
                         .setResponseListener(response -> {
                             GameStatusEntity gameStatusEntities = new Gson()
                                     .fromJson(response, new TypeToken<GameStatusEntity>() {
                                     }.getType());
+
+                            if (gameStatusEntities.getFoundLocations() != null && mMap != null) {
+                                for (QRMarkerEntity entity : gameStatusEntities.getFoundLocations()) {
+                                    mMap.addMarker(new MarkerOptions().position(new LatLng(entity.getLatitude(), entity.getLongitude())).title(entity.getName()));
+                                }
+                            }
+
                             StoredData.saveInt(this, StoredData.FOUND_MARKERS, gameStatusEntities.getFoundMarkers());
                             StoredData.saveInt(this, StoredData.TOTAL_MARKERS, gameStatusEntities.getTotalMarkers());
                             StoredData.saveInt(this, StoredData.TOTAL_SCORE, gameStatusEntities.getTotalScore());
-                        })
-                        .setErrorListener(error -> {
 
+                            foundMarkers.setText(gameStatusEntities.getFoundMarkers() + " / " + gameStatusEntities.getTotalMarkers());
                         })
+                        .setErrorListener(error -> Toast.make(this, getString(R.string.error_cannot_update_latest_marker_info)))
                         .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
                         .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
                         .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
                         .build(this)
         );
 
-        if(StoredData.getInt(this,StoredData.FOUND_MARKERS) == StoredData.getInt(this,StoredData.TOTAL_MARKERS)){
+        if (StoredData.getInt(this, StoredData.FOUND_MARKERS) == StoredData.getInt(this, StoredData.TOTAL_MARKERS)) {
             startActivity(new Intent(this, GameEndInfoActivity.class));
         }
     }
@@ -210,7 +215,6 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
             String markerTitle = info.get("name").getAsString();
             double latitude = info.get("latitude").getAsDouble();
             double longitude = info.get("longitude").getAsDouble();
-            //TODO: send markerId as well on the server
 
             runOnUiThread(() -> {
                 if (mMap != null) {
@@ -246,8 +250,13 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                                             }.getType());
 
                                     QRMarkersViewModel.updateIsFound(true, qrMarkerEntity.getId());
-                                    StoredData.saveInt(this, StoredData.TOTAL_SCORE, Integer.valueOf(StoredData.TOTAL_SCORE)+10);
-                                    StoredData.saveInt(this, StoredData.FOUND_MARKERS, Integer.valueOf(StoredData.FOUND_MARKERS)+1);
+
+                                    int currentFoundMarkers = StoredData.getInt(this, StoredData.FOUND_MARKERS);
+                                    int currentTotalScore = StoredData.getInt(this, StoredData.TOTAL_SCORE);
+                                    StoredData.saveInt(this, StoredData.TOTAL_SCORE, currentTotalScore + 10);
+                                    StoredData.saveInt(this, StoredData.FOUND_MARKERS, currentFoundMarkers + 1);
+
+                                    foundMarkers.setText((currentFoundMarkers + 1) + " / " + StoredData.getInt(this, StoredData.TOTAL_MARKERS));
 
                                     String description = qrMarkerEntity.getDescription();
                                     mMap.addMarker(new MarkerOptions().position(new LatLng(qrMarkerEntity.getLatitude(), qrMarkerEntity.getLongitude())).title(qrMarkerEntity.getName()).snippet(description.substring(0, Math.min(description.length(), 50)) + "..."));
