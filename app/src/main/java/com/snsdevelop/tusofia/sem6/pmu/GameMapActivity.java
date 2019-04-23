@@ -219,6 +219,14 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
             runOnUiThread(() -> {
                 if (mMap != null) {
                     mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(markerTitle));
+
+                    int currentFoundMarkers = StoredData.getInt(this, StoredData.FOUND_MARKERS);
+                    int currentTotalScore = StoredData.getInt(this, StoredData.TOTAL_SCORE);
+                    StoredData.saveInt(this, StoredData.TOTAL_SCORE, currentTotalScore + 10);
+                    StoredData.saveInt(this, StoredData.FOUND_MARKERS, currentFoundMarkers + 1);
+
+                    foundMarkers.setText((currentFoundMarkers + 1) + " / " + StoredData.getInt(this, StoredData.TOTAL_MARKERS));
+
                     //TODO: display push notification about the found marker
                 }
             });
