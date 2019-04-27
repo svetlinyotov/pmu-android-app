@@ -50,4 +50,7 @@
         android:layout_height="50dp"
         android:background="@drawable/button_give_up"
         android:contentDescription="@string/description" />
+
+
+    <include layout="@layout/progress_box" />
 </RelativeLayout>

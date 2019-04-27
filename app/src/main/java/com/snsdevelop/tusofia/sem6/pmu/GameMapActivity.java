@@ -2,10 +2,13 @@ package com.snsdevelop.tusofia.sem6.pmu;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,6 +24,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -35,6 +40,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.FieldNamingPolicy;
@@ -57,24 +63,29 @@ import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameStatus;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.StoredData;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.snsdevelop.tusofia.sem6.pmu.Utils.PermissionCheck.LOCATION_PERMISSION_REQUEST_CODE;
 
 public class GameMapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private SupportMapFragment mapFragment;
+    private final static String FOUND_MARKER_NOTIFICATION_CHANNEL = "FOUND_MARKER_NOTIFICATION_CHANNEL";
+    private final static int FOUND_MARKER_NOTIFICATION_ID = 1001;
     private GoogleMap mMap;
     private Request serverRequest;
     private PusherConnection pusherConnection;
     private Map<String, Marker> usersMarkers;
+    private List<LatLng> markersOnMap;
     private FusedLocationProviderClient fusedLocationClient;
     private QRMarkersViewModel QRMarkersViewModel;
     private RelativeLayout mRelativeLayout;
     private PopupWindow mPopupWindow;
     private Context mContext;
     private TextView foundMarkers;
+    private RelativeLayout progressBar;
     public static final int requestCode = 1;
 
     LocationCallback locationCallback = new LocationCallback() {
@@ -83,11 +94,8 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
             super.onLocationResult(locationResult);
 
             if (locationResult != null) {
-
                 Location lastLocation = locationResult.getLastLocation();
-
                 sendLocation(lastLocation);
-
             }
         }
     };
@@ -96,6 +104,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_map);
+        progressBar = findViewById(R.id.layoutProgressBar);
         QRMarkersViewModel = ViewModelProviders.of(this).get(QRMarkersViewModel.class);
         mRelativeLayout = findViewById(R.id.gameMap);
         mContext = getApplicationContext();
@@ -104,17 +113,13 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         ImageButton buttonCamera = findViewById(R.id.buttonCamera);
         foundMarkers = findViewById(R.id.tvMarkersFound);
 
-        foundMarkers.setOnClickListener((v) -> {
-            startActivity(new Intent(this, FoundQRMarkersActivity.class));
-        });
+        foundMarkers.setOnClickListener((v) -> startActivity(new Intent(this, FoundQRMarkersActivity.class)));
 
-        buttonCamera.setOnClickListener((v) -> {
-            startActivityForResult(new Intent(this, QRCameraActivity.class), requestCode);
-        });
+        buttonCamera.setOnClickListener((v) -> startActivityForResult(new Intent(this, QRCameraActivity.class), requestCode));
 
         serverRequest = new Request(this);
 
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapInGameMode);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapInGameMode);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
@@ -129,6 +134,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                         .setNegativeButton(getString(R.string.answer_no), (dialogInterface, which) -> dialogInterface.cancel())
                         .create()));
 
+        markersOnMap = new ArrayList<>();
         usersMarkers = new HashMap<>();
 
         serverRequest.send(
@@ -138,9 +144,18 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                                     .fromJson(response, new TypeToken<GameStatusEntity>() {
                                     }.getType());
 
+                            LatLngBounds.Builder nearestMarkerAndLocationBounds = new LatLngBounds.Builder();
+
+                            boolean isAnyPoints = false;
                             if (gameStatusEntities.getFoundLocations() != null && mMap != null) {
                                 for (QRMarkerEntity entity : gameStatusEntities.getFoundLocations()) {
-                                    mMap.addMarker(new MarkerOptions().position(new LatLng(entity.getLatitude(), entity.getLongitude())).title(entity.getName()));
+                                    LatLng position = new LatLng(entity.getLatitude(), entity.getLongitude());
+                                    if (!markersOnMap.contains(position)) {
+                                        nearestMarkerAndLocationBounds.include(position);
+                                        mMap.addMarker(new MarkerOptions().position(position).title(entity.getName()));
+                                        markersOnMap.add(position);
+                                        isAnyPoints = true;
+                                    }
                                 }
                             }
 
@@ -149,6 +164,10 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                             StoredData.saveInt(this, StoredData.TOTAL_SCORE, gameStatusEntities.getTotalScore());
 
                             foundMarkers.setText(gameStatusEntities.getFoundMarkers() + " / " + gameStatusEntities.getTotalMarkers());
+
+                            if (isAnyPoints) {
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(nearestMarkerAndLocationBounds.build(), 150));
+                            }
                         })
                         .setErrorListener(error -> Toast.make(this, getString(R.string.error_cannot_update_latest_marker_info)))
                         .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
@@ -157,7 +176,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                         .build(this)
         );
 
-        if (StoredData.getInt(this, StoredData.FOUND_MARKERS) == StoredData.getInt(this, StoredData.TOTAL_MARKERS)) {
+        if (StoredData.getInt(this, StoredData.FOUND_MARKERS) >= StoredData.getInt(this, StoredData.TOTAL_MARKERS) && StoredData.getInt(this, StoredData.TOTAL_MARKERS) != 0) {
             startActivity(new Intent(this, GameEndInfoActivity.class));
         }
     }
@@ -211,7 +230,8 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         pusherEvents.put(PusherConnection.EVENT_FOUND_QR_CODE, (String channelName, String eventName, final String data) -> {
             JsonObject info = new Gson().fromJson(data, JsonObject.class);
 
-            String userId = info.get("userId").getAsString();
+//            String userId = info.get("userId").getAsString();
+            String userName = info.get("userName").getAsString();
             String markerTitle = info.get("name").getAsString();
             double latitude = info.get("latitude").getAsDouble();
             double longitude = info.get("longitude").getAsDouble();
@@ -227,11 +247,33 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
                     foundMarkers.setText((currentFoundMarkers + 1) + " / " + StoredData.getInt(this, StoredData.TOTAL_MARKERS));
 
-                    //TODO: display push notification about the found marker
+                    if (StoredData.getInt(this, StoredData.FOUND_MARKERS) >= StoredData.getInt(this, StoredData.TOTAL_MARKERS)
+                            && !mPopupWindow.isShowing()
+                            && StoredData.getInt(this, StoredData.TOTAL_MARKERS) != 0) {
+                        startActivity(new Intent(this, GameEndInfoActivity.class));
+                    }
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, FOUND_MARKER_NOTIFICATION_CHANNEL)
+                            .setSmallIcon(android.R.drawable.ic_dialog_map)
+                            .setContentTitle(getString(R.string.notification_found_marker, markerTitle))
+                            .setContentText(getString(R.string.notification_found_marker_user, userName, markerTitle))
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                        NotificationChannel channel = new NotificationChannel(FOUND_MARKER_NOTIFICATION_CHANNEL, "Found QR codes", importance);
+
+                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                        notificationManager.createNotificationChannel(channel);
+                    }
+
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+
+                    notificationManager.notify(FOUND_MARKER_NOTIFICATION_ID, builder.build());
                 }
             });
         });
-
 
         pusherConnection.bindChannelWithEvents(
                 PusherConnection.formatChannelName(PusherConnection.CHANNEL_USER_GAME, StoredData.getInt(this, StoredData.GAME_ID)),
@@ -245,54 +287,60 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
-                String result = data.getStringExtra("barcode");
-                serverRequest.send(
-                        new RequestBuilder(Method.POST, URL.GAME_QR)
-                                .setResponseListener(response -> {
-                                    QRMarkerEntity qrMarkerEntity = new GsonBuilder()
-                                            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                                            .create()
-                                            .fromJson(response, new TypeToken<QRMarkerEntity>() {
-                                            }.getType());
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            progressBar.setVisibility(View.VISIBLE);
 
-                                    QRMarkersViewModel.updateIsFound(true, qrMarkerEntity.getId());
+            String result = data.getStringExtra("barcode");
+            serverRequest.send(
+                    new RequestBuilder(Method.POST, URL.GAME_QR)
+                            .setResponseListener(response -> {
+                                QRMarkerEntity qrMarkerEntity = new GsonBuilder()
+                                        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                                        .create()
+                                        .fromJson(response, new TypeToken<QRMarkerEntity>() {
+                                        }.getType());
 
-                                    int currentFoundMarkers = StoredData.getInt(this, StoredData.FOUND_MARKERS);
-                                    int currentTotalScore = StoredData.getInt(this, StoredData.TOTAL_SCORE);
-                                    StoredData.saveInt(this, StoredData.TOTAL_SCORE, currentTotalScore + 10);
-                                    StoredData.saveInt(this, StoredData.FOUND_MARKERS, currentFoundMarkers + 1);
+                                QRMarkersViewModel.updateIsFound(true, qrMarkerEntity.getId());
 
-                                    foundMarkers.setText((currentFoundMarkers + 1) + " / " + StoredData.getInt(this, StoredData.TOTAL_MARKERS));
+                                int currentFoundMarkers = StoredData.getInt(this, StoredData.FOUND_MARKERS);
+                                int currentTotalScore = StoredData.getInt(this, StoredData.TOTAL_SCORE);
+                                StoredData.saveInt(this, StoredData.TOTAL_SCORE, currentTotalScore + 10);
+                                StoredData.saveInt(this, StoredData.FOUND_MARKERS, currentFoundMarkers + 1);
 
-                                    String description = qrMarkerEntity.getDescription();
-                                    mMap.addMarker(new MarkerOptions().position(new LatLng(qrMarkerEntity.getLatitude(), qrMarkerEntity.getLongitude())).title(qrMarkerEntity.getName()).snippet(description.substring(0, Math.min(description.length(), 50)) + "..."));
+                                foundMarkers.setText((currentFoundMarkers + 1) + " / " + StoredData.getInt(this, StoredData.TOTAL_MARKERS));
 
-                                    displayMarkerInfoPopup(qrMarkerEntity.getId());
-                                })
-                                .setErrorListener(error -> {
-                                    if (error.networkResponse != null &&
-                                            error.networkResponse.data != null &&
-                                            new String(error.networkResponse.data).contains("QR_ALREADY_FOUND")) {
-                                        AlertDialog.styled(this, new AlertDialog(this).getBuilder()
-                                                .setTitle(getString(R.string.cant_read_info_twice))
-                                                .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> dialogInterface.cancel())
-                                                .create());
-                                    } else {
-                                        AlertDialog.styled(this, new AlertDialog(this).getBuilder()
-                                                .setTitle(getString(R.string.invalid_scan))
-                                                .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> dialogInterface.cancel())
-                                                .create());
-                                    }
-                                })
-                                .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
-                                .addParam("qrCode", result)
-                                .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
-                                .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
-                                .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
-                                .build(this));
-            }
+                                String description = qrMarkerEntity.getDescription();
+                                mMap.addMarker(new MarkerOptions().position(new LatLng(qrMarkerEntity.getLatitude(), qrMarkerEntity.getLongitude())).title(qrMarkerEntity.getName()).snippet(description.substring(0, Math.min(description.length(), 50)) + "..."));
+
+                                displayMarkerInfoPopup(qrMarkerEntity.getId());
+
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(qrMarkerEntity.getLatitude(), qrMarkerEntity.getLongitude()), 14));
+
+                                progressBar.setVisibility(View.GONE);
+                            })
+                            .setErrorListener(error -> {
+                                if (error.networkResponse != null &&
+                                        error.networkResponse.data != null &&
+                                        new String(error.networkResponse.data).contains("QR_ALREADY_FOUND")) {
+                                    AlertDialog.styled(this, new AlertDialog(this).getBuilder()
+                                            .setTitle(getString(R.string.cant_read_info_twice))
+                                            .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> dialogInterface.cancel())
+                                            .create());
+                                } else {
+                                    AlertDialog.styled(this, new AlertDialog(this).getBuilder()
+                                            .setTitle(getString(R.string.invalid_scan))
+                                            .setNeutralButton(getString(R.string.button_ok), (dialogInterface, which) -> dialogInterface.cancel())
+                                            .create());
+                                }
+                                progressBar.setVisibility(View.GONE);
+                            })
+                            .addParam("gameId", String.valueOf(StoredData.getInt(this, StoredData.GAME_ID)))
+                            .addParam("qrCode", result)
+                            .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                            .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                            .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+                            .build(this));
+
         }
     }
 
@@ -311,6 +359,22 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         enableMyLocationIfPermitted();
+
+        LatLngBounds.Builder nearestMarkerAndLocationBounds = new LatLngBounds.Builder();
+        List<QRMarkerEntity> allMarkers = QRMarkersViewModel.getAll();
+        boolean isAnyPoints = false;
+        for (QRMarkerEntity markerEntity : allMarkers) {
+            LatLng position = new LatLng(markerEntity.getLatitude(), markerEntity.getLongitude());
+            if (markerEntity.isFound() && !markersOnMap.contains(position)) {
+                nearestMarkerAndLocationBounds.include(position);
+                mMap.addMarker(new MarkerOptions().position(position).title(markerEntity.getName()));
+                isAnyPoints = true;
+            }
+        }
+
+        if (isAnyPoints) {
+            mMap.setOnMapLoadedCallback(() -> mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(nearestMarkerAndLocationBounds.build(), 150)));
+        }
     }
 
     @Override
@@ -333,7 +397,15 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         ImageButton closeButton = popup.findViewById(R.id.closePopUp);
         WebView webView = popup.findViewById(R.id.webViewQRMarkerPopup);
 
-        closeButton.setOnClickListener(view -> mPopupWindow.dismiss());
+        //TODO: ask here the user with alert dialog if is sure to close cuz cannot open info again
+        closeButton.setOnClickListener(view -> {
+            mPopupWindow.dismiss();
+
+            if (StoredData.getInt(this, StoredData.FOUND_MARKERS) >= StoredData.getInt(this, StoredData.TOTAL_MARKERS)
+                    && StoredData.getInt(this, StoredData.TOTAL_MARKERS) != 0) {
+                startActivity(new Intent(this, GameEndInfoActivity.class));
+            }
+        });
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -364,8 +436,20 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                     null
             );
 
-            fusedLocationClient.getLastLocation().addOnSuccessListener(location ->
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude()))));
+            fusedLocationClient.requestLocationUpdates(
+                    new LocationRequest().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY).setNumUpdates(1),
+                    new LocationCallback() {
+                        @Override
+                        public void onLocationResult(LocationResult location) {
+                            super.onLocationResult(location);
+
+                            if (location != null && location.getLastLocation() != null) {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLastLocation().getLatitude(), location.getLastLocation().getLongitude()), 12));
+                            }
+                        }
+                    },
+                    null
+            );
 
             mMap.setMyLocationEnabled(true);
         }

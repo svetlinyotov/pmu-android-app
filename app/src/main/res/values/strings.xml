@@ -71,5 +71,7 @@
     <string name="error_taking_marker_list">Error taking found markers list</string>
     <string name="error_cannot_update_latest_marker_info">Cannot update latest marker info</string>
     <string name="error_allow_camera_permission">You must allow camera to scan QR code</string>
+    <string name="notification_found_marker">Found: %s</string>
+    <string name="notification_found_marker_user">%s found %s! Go! Find the other markers.</string>
 
 </resources>

@@ -2,6 +2,7 @@ package com.snsdevelop.tusofia.sem6.pmu.Database.Entities;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
@@ -11,7 +12,8 @@ import static androidx.room.ForeignKey.CASCADE;
         @ForeignKey(entity = LocationEntity.class,
                 parentColumns = "id",
                 childColumns = "locationId",
-                onDelete = CASCADE))
+                onDelete = CASCADE),
+        indices = {@Index("locationId")})
 public class QRMarkerEntity {
 
     @PrimaryKey

@@ -100,7 +100,7 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
                 Log.d("KUR", c.getTitle() + " " + c.getTag());
                 Log.d("KUR", String.valueOf(lastLocation.distanceTo(a)));
 
-                if (lastLocation.distanceTo(a) < 20000) {
+                if (lastLocation.distanceTo(a) < 200009999) {
                     startGame.setVisibility(View.VISIBLE);
                     textStartGame.setVisibility(View.VISIBLE);
                 } else {
@@ -136,6 +136,8 @@ public class LocationsActivity extends BaseActivity implements OnMapReadyCallbac
             StoredData.saveInt(this, StoredData.GAME_ID, -1);
             StoredData.saveString(this, StoredData.GAME_NAME, null);
             StoredData.saveBoolean(this, StoredData.GAME_IS_TEAM_HOST, false);
+            StoredData.saveInt(this, StoredData.TOTAL_MARKERS, 0);
+            StoredData.saveInt(this, StoredData.TOTAL_SCORE, 0);
         }
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()

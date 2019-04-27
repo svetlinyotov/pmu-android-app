@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -173,7 +174,7 @@ public class MainActivity extends Activity {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(new Intent(this, LocationBackgroundService.class));
+                    ContextCompat.startForegroundService(this, new Intent(this, LocationBackgroundService.class));
                 } else {
                     startService(new Intent(this, LocationBackgroundService.class));
                 }
