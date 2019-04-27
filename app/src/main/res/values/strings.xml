@@ -64,14 +64,19 @@
     <string name="title_qrmarkers">Markers (%d from %d)</string>
     <string name="button_cancel">Cancel</string>
     <string name="cant_read_info_twice">This code is already scanned!</string>
-    <string name="invalid_scan">This code is invalid!</string>
+    <string name="invalid_scan">This code is invalid!</string>0
     <string name="button_ok">OK</string>
     <string name="title_end_game">Game info</string>
-    <string name="button_start_test">Start test</string>
+    <string name="button_start_test">Start quiz</string>
     <string name="error_taking_marker_list">Error taking found markers list</string>
     <string name="error_cannot_update_latest_marker_info">Cannot update latest marker info</string>
     <string name="error_allow_camera_permission">You must allow camera to scan QR code</string>
     <string name="notification_found_marker">Found: %s</string>
     <string name="notification_found_marker_user">%s found %s! Go! Find the other markers.</string>
+    <string name="label_time_playing">Time playing</string>
+    <string name="label_you_found">You found</string>
+    <string name="label_places">places</string>
+    <string name="error_cannot_update_info">Cannot update info</string>
+    <string name="title_quiz">Quiz</string>
 
 </resources>

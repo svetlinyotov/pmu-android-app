@@ -22,4 +22,5 @@ public interface URL {
     String GAME_START_TEAM_LIST_PLAYERS = PREFIX + "/game/start/team/list/players";
     String GAME_QR = PREFIX + "/game/qr";
     String GAME_STATUS = PREFIX + "/game/{id}/status";
+    String GAME_ALL_MARKERS_FOUND_INFO = PREFIX + "/game/{id}/all_markers";
 }
