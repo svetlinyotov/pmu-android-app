@@ -16,6 +16,7 @@ public class QuizActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Toast.make(this, getString(R.string.error_going_back));
     }
 }

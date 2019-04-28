@@ -230,7 +230,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         pusherEvents.put(PusherConnection.EVENT_FOUND_QR_CODE, (String channelName, String eventName, final String data) -> {
             JsonObject info = new Gson().fromJson(data, JsonObject.class);
 
-//            String userId = info.get("userId").getAsString();
+            String userId = info.get("userId").getAsString();
             String userName = info.get("userName").getAsString();
             String markerTitle = info.get("name").getAsString();
             double latitude = info.get("latitude").getAsDouble();
@@ -239,38 +239,39 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
             runOnUiThread(() -> {
                 if (mMap != null) {
                     mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(markerTitle));
+                    if (!(userId.equals(StoredData.getString(this, StoredData.LOGGED_USER_ID)))){
+                        int currentFoundMarkers = StoredData.getInt(this, StoredData.FOUND_MARKERS);
+                        int currentTotalScore = StoredData.getInt(this, StoredData.TOTAL_SCORE);
+                        StoredData.saveInt(this, StoredData.TOTAL_SCORE, currentTotalScore + 10);
+                        StoredData.saveInt(this, StoredData.FOUND_MARKERS, currentFoundMarkers + 1);
 
-                    int currentFoundMarkers = StoredData.getInt(this, StoredData.FOUND_MARKERS);
-                    int currentTotalScore = StoredData.getInt(this, StoredData.TOTAL_SCORE);
-                    StoredData.saveInt(this, StoredData.TOTAL_SCORE, currentTotalScore + 10);
-                    StoredData.saveInt(this, StoredData.FOUND_MARKERS, currentFoundMarkers + 1);
+                        foundMarkers.setText((currentFoundMarkers + 1) + " / " + StoredData.getInt(this, StoredData.TOTAL_MARKERS));
 
-                    foundMarkers.setText((currentFoundMarkers + 1) + " / " + StoredData.getInt(this, StoredData.TOTAL_MARKERS));
+                        if (StoredData.getInt(this, StoredData.FOUND_MARKERS) >= StoredData.getInt(this, StoredData.TOTAL_MARKERS)
+                                && !mPopupWindow.isShowing()
+                                && StoredData.getInt(this, StoredData.TOTAL_MARKERS) != 0) {
+                            startActivity(new Intent(this, GameEndInfoActivity.class));
+                        }
 
-                    if (StoredData.getInt(this, StoredData.FOUND_MARKERS) >= StoredData.getInt(this, StoredData.TOTAL_MARKERS)
-                            && !mPopupWindow.isShowing()
-                            && StoredData.getInt(this, StoredData.TOTAL_MARKERS) != 0) {
-                        startActivity(new Intent(this, GameEndInfoActivity.class));
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, FOUND_MARKER_NOTIFICATION_CHANNEL)
+                                .setSmallIcon(android.R.drawable.ic_dialog_map)
+                                .setContentTitle(getString(R.string.notification_found_marker, markerTitle))
+                                .setContentText(getString(R.string.notification_found_marker_user, userName, markerTitle))
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                            NotificationChannel channel = new NotificationChannel(FOUND_MARKER_NOTIFICATION_CHANNEL, "Found QR codes", importance);
+
+                            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+                            notificationManager.createNotificationChannel(channel);
+                        }
+
+                        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+
+                        notificationManager.notify(FOUND_MARKER_NOTIFICATION_ID, builder.build());
                     }
-
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, FOUND_MARKER_NOTIFICATION_CHANNEL)
-                            .setSmallIcon(android.R.drawable.ic_dialog_map)
-                            .setContentTitle(getString(R.string.notification_found_marker, markerTitle))
-                            .setContentText(getString(R.string.notification_found_marker_user, userName, markerTitle))
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        int importance = NotificationManager.IMPORTANCE_DEFAULT;
-                        NotificationChannel channel = new NotificationChannel(FOUND_MARKER_NOTIFICATION_CHANNEL, "Found QR codes", importance);
-
-                        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-                        notificationManager.createNotificationChannel(channel);
-                    }
-
-                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-
-                    notificationManager.notify(FOUND_MARKER_NOTIFICATION_ID, builder.build());
                 }
             });
         });
