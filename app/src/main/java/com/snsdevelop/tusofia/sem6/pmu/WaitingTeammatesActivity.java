@@ -10,12 +10,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.pusher.client.channel.SubscriptionEventListener;
+import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.QRMarkersViewModel;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.PlayerEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Pusher.PusherConnection;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
@@ -40,6 +42,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
     private ArrayAdapter<String> playersAdapter;
     private SwipeRefreshLayout layoutSwipePlayers;
     private PusherConnection pusherConnection;
+    private QRMarkersViewModel QRMarkersViewModel;
 
 
     @Override
@@ -53,6 +56,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
         ProgressBar progressBar = findViewById(R.id.progressBar_cyclic);
         TextView textViewTitleNewTeamName = findViewById(R.id.textViewTitleNewTeamName);
         Button buttonCancelTeamPlay = findViewById(R.id.buttonCancelTeamPlay);
+        QRMarkersViewModel = ViewModelProviders.of(this).get(QRMarkersViewModel.class);
 
         serverRequest = new Request(this);
         layoutSwipePlayers = findViewById(R.id.layoutSwipePlayers);
@@ -101,7 +105,7 @@ public class WaitingTeammatesActivity extends AppCompatActivity {
                 serverRequest.send(
                         new RequestBuilder(Method.POST, URL.GAME_START_TEAM_PLAY)
                                 .setResponseListener(response -> {
-
+                                    QRMarkersViewModel.clearFoundStatus();
                                     StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.RUNNING));
                                     startActivity(new Intent(this, GameMapActivity.class));
                                 })

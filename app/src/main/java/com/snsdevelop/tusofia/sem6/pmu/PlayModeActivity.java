@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.snsdevelop.tusofia.sem6.pmu.Database.ViewModels.QRMarkersViewModel;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameEntity;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 
 import static com.snsdevelop.tusofia.sem6.pmu.LocationsActivity.NEAREST_LOCATION_ID_EXTRA;
 
@@ -36,6 +38,7 @@ public class PlayModeActivity extends AppCompatActivity {
 
     private Request serverRequest;
     private int locationId;
+    private QRMarkersViewModel QRMarkersViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,7 @@ public class PlayModeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_play_mode);
 
         serverRequest = new Request(this);
+        QRMarkersViewModel = ViewModelProviders.of(this).get(QRMarkersViewModel.class);
 
         locationId = getIntent().getIntExtra(NEAREST_LOCATION_ID_EXTRA, 0);
 
@@ -69,6 +73,8 @@ public class PlayModeActivity extends AppCompatActivity {
                                                 .setResponseListener(response -> {
                                                     try {
                                                         JsonObject gameInfo = new Gson().fromJson(response, JsonObject.class);
+
+                                                        QRMarkersViewModel.clearFoundStatus();
 
                                                         StoredData.saveString(this, StoredData.GAME_MODE, String.valueOf(PlayMode.SINGLE));
                                                         StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.RUNNING));
