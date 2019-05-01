@@ -36,7 +36,7 @@
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/ivTitleStar"
             android:layout_toEndOf="@id/buttonBack"
-            android:fontFamily="@font/history_lowercase"
+            android:fontFamily="@font/bulgaria_moderna"
             android:gravity="center_vertical|end"
             android:text="@string/title_all_games_list"
             android:textAlignment="viewEnd"

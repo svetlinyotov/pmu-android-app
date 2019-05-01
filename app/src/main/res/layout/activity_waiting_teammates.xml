@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginEnd="10dp"
-            android:fontFamily="@font/history_lowercase"
+            android:fontFamily="@font/bulgaria_moderna"
             android:gravity="center"
             android:text="@string/title_teammates"
             android:textAlignment="center"
@@ -80,7 +80,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:fontFamily="@font/history_lowercase"
+        android:fontFamily="@font/bulgaria_moderna"
         android:gravity="center"
         android:textAlignment="center"
         android:textSize="25sp" />

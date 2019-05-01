@@ -21,7 +21,7 @@
             android:layout_centerInParent="true"
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/ivTitleStar"
-            android:fontFamily="@font/history_lowercase"
+            android:fontFamily="@font/bulgaria_moderna"
             android:gravity="center_vertical|end"
             android:text="@string/title_quiz"
             android:textAlignment="viewEnd"

@@ -5,11 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.snsdevelop.tusofia.sem6.pmu.R;
 import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.QuizEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -18,17 +21,20 @@ public class QuizAdapter extends ArrayAdapter<QuizEntity> {
     private Context mContext;
     private int mResource;
     private List<QuizEntity> mData;
+    public static ArrayList<Integer> selectedAnswers;
 
     public QuizAdapter(Context context, int resource) {
         super(context, resource);
         mContext = context;
         mResource = resource;
+        selectedAnswers = new ArrayList<>();
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         ViewHolder holder;
+        QuizEntity quizEntity = getItem(position);
 
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
@@ -38,11 +44,31 @@ public class QuizAdapter extends ArrayAdapter<QuizEntity> {
             holder.answer1 = convertView.findViewById(R.id.tvAnswer1);
             holder.answer2 = convertView.findViewById(R.id.tvAnswer2);
             holder.answer3 = convertView.findViewById(R.id.tvAnswer3);
+            holder.answer1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked)
+                        selectedAnswers.add(quizEntity.getAnswers()[0].getId());
+                }
+            });
+            holder.answer2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked)
+                        selectedAnswers.add(quizEntity.getAnswers()[1].getId());
+                }
+            });
+            holder.answer3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked)
+                        selectedAnswers.add(quizEntity.getAnswers()[2].getId());
+                }
+            });
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        QuizEntity quizEntity = getItem(position);
         if (quizEntity != null) {
             holder.question.setText(quizEntity.getQuestion());
             holder.answer1.setText(quizEntity.getAnswers()[0].getAnswer());
@@ -55,8 +81,8 @@ public class QuizAdapter extends ArrayAdapter<QuizEntity> {
 
     private static class ViewHolder {
         TextView question;
-        TextView answer1;
-        TextView answer2;
-        TextView answer3;
+        RadioButton answer1;
+        RadioButton answer2;
+        RadioButton answer3;
     }
 }

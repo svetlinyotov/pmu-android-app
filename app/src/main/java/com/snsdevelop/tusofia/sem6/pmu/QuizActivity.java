@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -66,6 +67,18 @@ public class QuizActivity extends AppCompatActivity {
                             .setTitle(getString(R.string.are_you_ready))
                             .setNegativeButton(getString(R.string.answer_no), (dialogInterface, which) -> dialogInterface.cancel())
                             .setPositiveButton(getString(R.string.answer_yes), (dialogInterface, which) -> {
+                                serverRequest.send(
+                                        new RequestBuilder(Method.POST, URL.GAME_QUIZ,  StoredData.getInt(this, StoredData.GAME_ID))
+                                                .setResponseListener(response -> {
+
+                                                })
+                                                .addParam("answers", convertAnswers())
+                                                .setErrorListener(error -> Toast.make(this, getString(R.string.error_cannot_send_answers)))
+                                                .addHeader("AuthOrigin", StoredData.getString(this, StoredData.LOGGED_USER_ORIGIN))
+                                                .addHeader("AccessToken", StoredData.getString(this, StoredData.LOGGED_USER_TOKEN))
+                                                .addHeader("AuthSocialId", StoredData.getString(this, StoredData.LOGGED_USER_ID))
+                                                .build(this)
+                                );
 
                             })
                             .create());
@@ -76,6 +89,14 @@ public class QuizActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Toast.make(this, getString(R.string.error_going_back));
+    }
+
+    public String convertAnswers(){
+        String answers = "";
+        for (int i = 0; i < quizAdapter.selectedAnswers.size(); i++) {
+            answers = answers + quizAdapter.selectedAnswers.get(i) + "|";
+        }
+        return answers;
     }
 
 }
