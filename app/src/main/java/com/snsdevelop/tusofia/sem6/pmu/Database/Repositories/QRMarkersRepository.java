@@ -45,6 +45,10 @@ public class QRMarkersRepository {
         new updateIsFoundAsyncTask(qrMarkersDao, isFound).execute(markerId);
     }
 
+    public void clearFoundStatus() {
+        new clearFoundStatus(qrMarkersDao).execute();
+    }
+
     public void deleteAll() {
         new deleteAllAsyncTask(qrMarkersDao).execute();
     }
@@ -92,6 +96,21 @@ public class QRMarkersRepository {
         @Override
         protected Void doInBackground(final Integer... params) {
             qrMarkersDao.updateIsFound(isFound, params[0]);
+            return null;
+        }
+    }
+
+    private static class clearFoundStatus extends AsyncTask<Void, Void, Void> {
+
+        private QRMarkersDao qrMarkersDao;
+
+        clearFoundStatus(QRMarkersDao dao) {
+            qrMarkersDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            qrMarkersDao.clearFoundStatus();
             return null;
         }
     }

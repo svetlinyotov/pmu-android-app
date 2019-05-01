@@ -33,6 +33,10 @@ public class QRMarkersViewModel extends AndroidViewModel {
         qrMarkersRepository.updateIsFound(isFound, markerId);
     }
 
+    public void clearFoundStatus() {
+        qrMarkersRepository.clearFoundStatus();
+    }
+
     public void deleteAll() {
         qrMarkersRepository.deleteAll();
     }

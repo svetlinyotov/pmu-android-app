@@ -129,7 +129,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                         .setTitle(getString(R.string.are_you_sure))
                         .setPositiveButton(getString(R.string.answer_yes), (dialogInterface, which) -> {
                             StoredData.saveString(this, StoredData.GAME_STATUS, String.valueOf(GameStatus.FINISHED));
-                            //TODO clear markers
+                            QRMarkersViewModel.clearFoundStatus();
                             startActivity(new Intent(this, LocationsActivity.class));
                         })
                         .setNegativeButton(getString(R.string.answer_no), (dialogInterface, which) -> dialogInterface.cancel())
@@ -399,20 +399,18 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
         ImageButton closeButton = popup.findViewById(R.id.closePopUp);
         WebView webView = popup.findViewById(R.id.webViewQRMarkerPopup);
 
-        closeButton.setOnClickListener(view -> {
-            AlertDialog.styled(this, new AlertDialog(this).getBuilder()
-                    .setTitle(getString(R.string.are_you_sure_no_more))
-                    .setPositiveButton(getString(R.string.answer_yes), (dialogInterface, which) -> {
-                        mPopupWindow.dismiss();
+        closeButton.setOnClickListener(view -> AlertDialog.styled(this, new AlertDialog(this).getBuilder()
+                .setTitle(getString(R.string.are_you_sure_no_more))
+                .setPositiveButton(getString(R.string.answer_yes), (dialogInterface, which) -> {
+                    mPopupWindow.dismiss();
 
-                        if (StoredData.getInt(this, StoredData.FOUND_MARKERS) >= StoredData.getInt(this, StoredData.TOTAL_MARKERS)
-                                && StoredData.getInt(this, StoredData.TOTAL_MARKERS) != 0) {
-                            startActivity(new Intent(this, GameEndInfoActivity.class));
-                        }
-                    })
-                    .setNegativeButton(getString(R.string.answer_no), (dialogInterface, which) -> dialogInterface.cancel())
-                    .create());
-        });
+                    if (StoredData.getInt(this, StoredData.FOUND_MARKERS) >= StoredData.getInt(this, StoredData.TOTAL_MARKERS)
+                            && StoredData.getInt(this, StoredData.TOTAL_MARKERS) != 0) {
+                        startActivity(new Intent(this, GameEndInfoActivity.class));
+                    }
+                })
+                .setNegativeButton(getString(R.string.answer_no), (dialogInterface, which) -> dialogInterface.cancel())
+                .create()));
 
         webView.setWebViewClient(new WebViewClient() {
             @Override

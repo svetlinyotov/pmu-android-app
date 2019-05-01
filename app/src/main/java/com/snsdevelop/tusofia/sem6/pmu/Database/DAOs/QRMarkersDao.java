@@ -20,6 +20,9 @@ public interface QRMarkersDao {
     @Query("UPDATE QRMarkers SET isFound = :isFound WHERE id = :markerId")
     void updateIsFound(boolean isFound, int markerId);
 
+    @Query("UPDATE QRMarkers SET isFound = 0")
+    void clearFoundStatus();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(QRMarkerEntity word);
 
