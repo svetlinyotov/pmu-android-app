@@ -16,7 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.pusher.client.channel.SubscriptionEventListener;
-import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.PlayerEntity;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.PlayerEntity;
 import com.snsdevelop.tusofia.sem6.pmu.Pusher.PusherConnection;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;

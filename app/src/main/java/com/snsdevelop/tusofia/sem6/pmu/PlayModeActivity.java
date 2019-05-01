@@ -2,28 +2,19 @@ package com.snsdevelop.tusofia.sem6.pmu;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.GameEntity;
-import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.LocationEntity;
+import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.GameEntity;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Method;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.Request;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.RequestBuilder;
@@ -40,7 +31,6 @@ import java.util.List;
 import androidx.appcompat.app.AppCompatActivity;
 
 import static com.snsdevelop.tusofia.sem6.pmu.LocationsActivity.NEAREST_LOCATION_ID_EXTRA;
-import static com.snsdevelop.tusofia.sem6.pmu.WaitingTeammatesActivity.TEAM_NAME_TO_DISPLAY_EXTRA;
 
 public class PlayModeActivity extends AppCompatActivity {
 

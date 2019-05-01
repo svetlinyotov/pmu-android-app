@@ -42,4 +42,19 @@
 
     <include layout="@layout/progress_box" />
 
+    <ListView
+        android:id="@+id/lvQuiz"
+        android:layout_below="@id/layoutTitleEndGame"
+        android:layout_above="@id/buttonFinish"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/buttonFinish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Finish" />
+
 </RelativeLayout>

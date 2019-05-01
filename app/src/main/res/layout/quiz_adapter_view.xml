@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:layout_marginBottom="20dp"
+    android:orientation="vertical"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
+    android:weightSum="100">
+
+    <TextView
+        android:id="@+id/tvQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/paper1"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:id="@+id/llAnswers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RadioGroup
+            android:id="@+id/rGAnswer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="80">
+
+            <RadioButton
+                android:id="@+id/tvAnswer1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_weight="26.6"
+                android:background="@drawable/paper1"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:textAlignment="textStart"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/tvAnswer2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_weight="26.6"
+                android:background="@drawable/paper1"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:textAlignment="textStart"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/tvAnswer3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_weight="26.6"
+                android:background="@drawable/paper1"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:textAlignment="textStart"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+
+        </RadioGroup>
+    </LinearLayout>
+</LinearLayout>

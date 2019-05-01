@@ -23,4 +23,5 @@ public interface URL {
     String GAME_QR = PREFIX + "/game/qr";
     String GAME_STATUS = PREFIX + "/game/{id}/status";
     String GAME_ALL_MARKERS_FOUND_INFO = PREFIX + "/game/{id}/all_markers";
+    String GAME_QUIZ = PREFIX + "/game/{id}/test";
 }

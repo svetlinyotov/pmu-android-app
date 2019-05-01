@@ -78,5 +78,8 @@
     <string name="label_places">places</string>
     <string name="error_cannot_update_info">Cannot update info</string>
     <string name="title_quiz">Quiz</string>
+    <string name="error_cannot_retrieve_questions">Error showing questions</string>
+    <string name="are_you_ready">Are you ready?</string>
+    <string name="are_you_sure_no_more">You won\'t be able to see this again! Are you sure you want to close?</string>
 
 </resources>
