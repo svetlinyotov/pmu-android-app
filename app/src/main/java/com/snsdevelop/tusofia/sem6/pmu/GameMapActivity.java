@@ -249,7 +249,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
                         foundMarkers.setText((currentFoundMarkers + 1) + " / " + StoredData.getInt(this, StoredData.TOTAL_MARKERS));
 
                         if (StoredData.getInt(this, StoredData.FOUND_MARKERS) >= StoredData.getInt(this, StoredData.TOTAL_MARKERS)
-                                && !mPopupWindow.isShowing()
+                                && mPopupWindow != null && !mPopupWindow.isShowing()
                                 && StoredData.getInt(this, StoredData.TOTAL_MARKERS) != 0) {
                             startActivity(new Intent(this, GameEndInfoActivity.class));
                         }
@@ -401,6 +401,7 @@ public class GameMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         closeButton.setOnClickListener(view -> AlertDialog.styled(this, new AlertDialog(this).getBuilder()
                 .setTitle(getString(R.string.are_you_sure_no_more))
+                .setMessage(getString(R.string.are_you_sure_closing_modal))
                 .setPositiveButton(getString(R.string.answer_yes), (dialogInterface, which) -> {
                     mPopupWindow.dismiss();
 

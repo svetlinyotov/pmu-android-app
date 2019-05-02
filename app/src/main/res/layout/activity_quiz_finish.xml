@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/history_background"
+    tools:context=".QuizFinishActivity">
+
+
+    <Button
+        android:id="@+id/buttonHome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button_gray_default"
+        android:textColor="#000"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/btn_to_home"
+        android:contentDescription="@string/description" />
+
+
+
+    <RelativeLayout
+        android:id="@+id/layoutTitleEndGame"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/old_color"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textViewTitleEndGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/ivTitleStar"
+            android:fontFamily="@font/bulgaria_moderna"
+            android:gravity="center_vertical|end"
+            android:text="@string/title_end"
+            android:textAlignment="viewEnd"
+            android:textSize="40sp" />
+
+        <ImageView
+            android:id="@+id/ivTitleStar"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:textAlignment="center"
+            android:visibility="visible"
+            app:srcCompat="@android:drawable/btn_star_big_on"
+            android:contentDescription="@string/description" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textViewTimePlayingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:textSize="25sp"
+        android:textColor="#000"
+        android:layout_below="@id/layoutTitleEndGame"
+        android:text="@string/label_found_markers" />
+
+    <TextView
+        android:id="@+id/textViewFoundMarkers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:textSize="35sp"
+        android:textColor="#000"
+        android:layout_below="@id/textViewTimePlayingText"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/textViewTrueAnswersTextPlace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:textSize="25sp"
+        android:textColor="#000"
+        android:layout_below="@id/textViewFoundMarkers"
+        android:text="@string/label_true_answers" />
+
+    <TextView
+        android:id="@+id/textViewTrueAnswers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="35sp"
+        android:textColor="#000"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@id/textViewTrueAnswersTextPlace"
+        android:text="" />
+
+
+    <ListView
+        android:id="@+id/lvQuizAnswers"
+        android:layout_below="@id/textViewTrueAnswers"
+        android:layout_above="@id/buttonHome"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <include layout="@layout/progress_box" />
+</RelativeLayout>

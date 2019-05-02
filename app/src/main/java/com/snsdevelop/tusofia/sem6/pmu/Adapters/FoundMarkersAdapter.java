@@ -8,20 +8,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.snsdevelop.tusofia.sem6.pmu.Database.Entities.QRMarkerEntity;
 import com.snsdevelop.tusofia.sem6.pmu.R;
 import com.snsdevelop.tusofia.sem6.pmu.ServerRequest.URL;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
-import java.util.Locale;
-
-import androidx.annotation.NonNull;
-
 public class FoundMarkersAdapter extends ArrayAdapter<QRMarkerEntity> {
     private Context mContext;
     private int mResource;
-    private List<QRMarkerEntity> mData;
 
     public FoundMarkersAdapter(Context context, int resource) {
         super(context, resource);
@@ -46,7 +42,7 @@ public class FoundMarkersAdapter extends ArrayAdapter<QRMarkerEntity> {
         }
         QRMarkerEntity qrMarkerEntity = getItem(position);
         if (qrMarkerEntity != null) {
-            Picasso.with(mContext).load(URL.MARKER_IMAGE_PREFIX + qrMarkerEntity.getPhoto()).resize(150, 150)
+            Picasso.get().load(URL.MARKER_IMAGE_PREFIX + qrMarkerEntity.getPhoto()).resize(150, 150)
                     .centerCrop().into(holder.pic);
             holder.name.setText(qrMarkerEntity.getName());
         }

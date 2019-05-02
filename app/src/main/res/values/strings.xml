@@ -80,7 +80,13 @@
     <string name="title_quiz">Тест</string>
     <string name="error_cannot_retrieve_questions">Грешка при показване на въпросите</string>
     <string name="are_you_ready">Готов/а ли си?</string>
-    <string name="are_you_sure_no_more">Този прозорез няма да се покаже повече! Сигурен/а ли си, че искаш да го затвориш?</string>
+    <string name="are_you_sure_no_more">Този прозорез няма да се покаже повече!</string>
     <string name="error_cannot_send_answers">Неуспешно изпращане на отговорите към сървъра</string>
+    <string name="are_you_sure_closing_modal">Сигурен/а ли си, че искаш да го затвориш?</string>
+    <string name="title_end">Край</string>
+    <string name="label_found_markers">Намерени локации</string>
+    <string name="label_true_answers">Верни отговори</string>
+    <string name="btn_to_home">Към началото</string>
+    <string name="btn_quiz_ready">Готово</string>
 
 </resources>

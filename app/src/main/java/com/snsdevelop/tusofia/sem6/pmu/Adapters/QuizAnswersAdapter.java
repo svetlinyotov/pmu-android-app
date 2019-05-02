@@ -16,16 +16,16 @@ import com.snsdevelop.tusofia.sem6.pmu.Utils.Entity.QuizEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuizAdapter extends BaseAdapter {
+public class QuizAnswersAdapter extends BaseAdapter {
     private Context mContext;
     private int mResource;
     private List<QuizEntity> data = new ArrayList<>();
-    public static ArrayList<Integer> selectedAnswers;
+    private List<Integer> selectedAnswers;
 
-    public QuizAdapter(Context context, int resource) {
+    public QuizAnswersAdapter(Context context, List<Integer> selectedAnswers, int resource) {
         mContext = context;
         mResource = resource;
-        selectedAnswers = new ArrayList<>();
+        this.selectedAnswers = selectedAnswers;
     }
 
     @Override
@@ -64,35 +64,25 @@ public class QuizAdapter extends BaseAdapter {
 
         if (quizEntity != null) {
             holder.question.setText(quizEntity.getQuestion());
-            holder.answer1.setText(quizEntity.getAnswers()[0].getAnswer());
-            holder.answer2.setText(quizEntity.getAnswers()[1].getAnswer());
-            holder.answer3.setText(quizEntity.getAnswers()[2].getAnswer());
 
-            holder.answer1.setChecked(selectedAnswers.contains(quizEntity.getAnswers()[0].getId()));
-            holder.answer2.setChecked(selectedAnswers.contains(quizEntity.getAnswers()[1].getId()));
-            holder.answer3.setChecked(selectedAnswers.contains(quizEntity.getAnswers()[2].getId()));
 
-            holder.answer1.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    selectedAnswers.add(quizEntity.getAnswers()[0].getId());
-                } else {
-                    selectedAnswers.remove((Integer) quizEntity.getAnswers()[0].getId());
+            List<RadioButton> buttons = new ArrayList<>();
+            buttons.add(holder.answer1);
+            buttons.add(holder.answer2);
+            buttons.add(holder.answer3);
+
+            for (int i = 0; i < buttons.size(); i++) {
+                RadioButton radioButton = buttons.get(i);
+
+                radioButton.setText(quizEntity.getAnswers()[i].getAnswer());
+                radioButton.setChecked(selectedAnswers.contains(quizEntity.getAnswers()[i].getId()));
+
+                if (quizEntity.getAnswers()[i].getIs_correct() == 1) {
+                    radioButton.setTextColor(mContext.getColor(android.R.color.holo_green_dark));
+                } else if (quizEntity.getAnswers()[i].getIs_correct() ==  0 && selectedAnswers.contains(quizEntity.getAnswers()[i].getId())) {
+                    radioButton.setTextColor(mContext.getColor(android.R.color.holo_red_dark));
                 }
-            });
-            holder.answer2.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    selectedAnswers.add(quizEntity.getAnswers()[1].getId());
-                } else {
-                    selectedAnswers.remove((Integer) quizEntity.getAnswers()[1].getId());
-                }
-            });
-            holder.answer3.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    selectedAnswers.add(quizEntity.getAnswers()[2].getId());
-                } else {
-                    selectedAnswers.remove((Integer) quizEntity.getAnswers()[2].getId());
-                }
-            });
+            }
         }
 
         return convertView;
