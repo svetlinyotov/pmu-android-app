@@ -56,7 +56,7 @@ public class FoundQRMarkersActivity extends AppCompatActivity {
                             GameStatusEntity gameStatus = new Gson().fromJson(response, new TypeToken<GameStatusEntity>() {
                             }.getType());
 
-                            Log.d("KUR", response);
+                            Log.d("QR", response);
 
                             qrMarkerAdapter.clear();
                             qrMarkerAdapter.addAll(gameStatus.getFoundLocations());

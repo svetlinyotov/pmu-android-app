@@ -84,7 +84,7 @@ public class PlayAudioService extends Service implements MediaPlayer.OnErrorList
                 mPlayer.release();
             } finally {
                 mPlayer = null;
-                Log.d("KUUUR", "NUUUL");
+                Log.d("Audio", "mPlayer is NULL");
             }
         }
     }
